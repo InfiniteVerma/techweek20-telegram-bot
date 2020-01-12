@@ -1,6 +1,6 @@
 require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
-
+const { Client } = require('pg');
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.TOKEN;
 
@@ -172,8 +172,39 @@ bot.onText(/\/details/, msg => {
 });
 
 //finally submitForm inserts it into the DB
-bot.onText(/\/submitForm/, msg => {
-  bot.sendMessage(msg.chat.id, "Yet to build this function");
+bot.onText(/\/ssubmitForm/, msg => {
+  // bot.sendMessage(msg.chat.id, "Yet to build this function");
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true
+  });
+  client.connect(err => {
+    if (err) {
+      console.log(err);
+      bot.sendMessage(msg.chat.id, 'Something went wrong! Try again')
+      return;
+    } else {
+      console.log("connected!");
+    }
+  });
+  
+  const now = new Date();
+  var noOutstation = outstation == "yes" ? 1 : 0;
+  const insertText =
+    "INSERT INTO techweek.participant(time, name, email, outstation, phone) VALUES ($1, $2, $3, $4, $5) returning *";
+  client.query(insertText, [now, msg.chat.first_name, email, noOutstation, phone_number], (err, data)=>{
+    if(err){
+      console.log(err);
+      client.end()
+      bot.sendMessage(msg.chat.id, 'Something went wrong! Try again');
+    }else{
+      console.log('Successful!');
+      client.end()
+      bot.sendMessage(msg.chat.id, 'Entry added in database!');
+    }
+  });
+
+  // client.end();
 });
 
 /*

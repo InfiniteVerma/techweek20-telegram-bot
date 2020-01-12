@@ -9,7 +9,8 @@
     "babel-polyfill": "^6.26.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "node-telegram-bot-api": "^0.40.0"
+    "node-telegram-bot-api": "^0.40.0",
+    "pg": "^7.17.1"
   },
   "devDependencies": {},
   "scripts": {
