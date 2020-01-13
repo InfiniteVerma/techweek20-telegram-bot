@@ -43,7 +43,7 @@ bot.onText(/\/register/, msg => {
     // bot.sendMessage(msg.chat.id, "You've already entered your details");
     bot.sendMessage(
       msg.chat.id,
-      "Got it! Editing your details, " + msg.chat.first_name
+      "Editing your details, " + msg.chat.first_name
     );
     bot
       .sendMessage(msg.chat.id, "Enter email", {
@@ -143,7 +143,6 @@ bot.onText(/\/register/, msg => {
       });
   }
 });
-
 //details command shows user information stored
 bot.onText(/\/details/, msg => {
   if (email == undefined || outstation == undefined) {
@@ -172,8 +171,8 @@ bot.onText(/\/details/, msg => {
 });
 
 //finally submitForm inserts it into the DB
-bot.onText(/\/ssubmitForm/, msg => {
-  // bot.sendMessage(msg.chat.id, "Yet to build this function");
+bot.onText(/\/submitForm/, msg => {
+
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true
