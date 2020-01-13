@@ -1,0 +1,8 @@
+var bot = require('./bot')
+require('./eventDetails')
+require('./eventRegistration')
+require('./details')
+require('./participantRegistration')
+require('./start')
+require('./submitEvents')
+require('./submitForm')
