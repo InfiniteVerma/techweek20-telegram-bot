@@ -1,4 +1,4 @@
-var bot = require('./bot')
+var bot = require('../bot')
 var info = require('./participantRegistration')
 //details command shows user information stored
 bot.onText(/\/details/, msg => {

@@ -1,2 +1,2 @@
-require('./ieeebot');
+require('./requirements');
 require('./web');

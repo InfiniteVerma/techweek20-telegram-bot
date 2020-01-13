@@ -1,4 +1,4 @@
-var bot = require("./bot");
+var bot = require("../bot");
 var info = require("./participantRegistration");
 const { Client } = require("pg");
 

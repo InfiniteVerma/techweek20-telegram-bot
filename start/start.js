@@ -1,4 +1,4 @@
-var bot = require("./bot");
+var bot = require("../bot");
 // start command
 bot.onText(/\/start/, msg => {
   console.log(msg.chat.id);

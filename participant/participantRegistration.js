@@ -1,4 +1,4 @@
-var bot = require('./bot')
+var bot = require('../bot')
 
 //variables to store user input
 var email;
