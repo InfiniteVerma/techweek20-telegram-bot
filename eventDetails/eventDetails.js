@@ -23,7 +23,7 @@ bot.onText(/\/eventDetails/, msg => {
           "\nElectronics: /elec" +
           "\nInformals: /info" +
           "\nPaper Presentation: /pp" +
-          "\nHackathon: /hack"
+          "\nHackathon: /1hack"
       );
     });
 });

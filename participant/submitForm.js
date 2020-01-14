@@ -7,7 +7,7 @@ bot.onText(/\/submitForm/, msg => {
   email = info.getEmail();
   phone_number = info.getPhoneNumber();
   outstation = info.getOutstation();
-
+  
   //if user hasn't submitted the details
   if (
     email == undefined ||

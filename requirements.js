@@ -18,6 +18,8 @@ require("./participant/submitForm");
 require("./eventRegistration/elecWorkshop");
 require("./eventRegistration/ppEvent");
 require("./eventRegistration/csoffline")
+require("./eventRegistration/hackathon")
+require("./eventRegistration/blackFlag")
 
 //start command
 require("./start/start");

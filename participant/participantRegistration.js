@@ -19,17 +19,10 @@ const requestPhoneKeyboard = {
     ]
   }
 };
-var yesno = {
-  // parse_mode: "Markdown",
-  reply_markup: {
-    one_time_keyboard: true,
-    keyboard: [["Yes"], ["No"]]
-    // }
-  }
-};
+
 //register command to store user information
 bot.onText(/\/register/, msg => {
-  if (phone_number != undefined) {
+ /* if (phone_number != undefined) {
     // bot.sendMessage(msg.chat.id, "You've already entered your details");
     bot.sendMessage(
       msg.chat.id,
@@ -76,7 +69,8 @@ bot.onText(/\/register/, msg => {
           }
         );
       });
-  } else {
+  } else */
+  {
     bot.sendMessage(
       msg.chat.id,
       "Got it! Starting your form, " + msg.chat.first_name

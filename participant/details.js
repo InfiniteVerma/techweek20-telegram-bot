@@ -1,40 +1,72 @@
-var bot = require('../bot')
-var info = require('./participantRegistration')
+var bot = require("../bot");
+var info = require("./participantRegistration");
+const { Client } = require("pg");
 //details command shows user information stored
-bot.onText(/\/details/, msg => {
-    email = info.getEmail()
-    phone_number = info.getPhoneNumber()
-    outstation = info.getOutstation()
-    console.log('Email: '+email + 'Phone NUmber: ' + phone_number + 'Outstation: ' + outstation)
-    if (email == undefined || outstation == undefined) {
-      console.log("Empty!");
-      
-      bot.sendMessage(msg.chat.id, "Use /register command first!");
-      return;
-    } else if (phone_number == undefined) {
-      bot.sendMessage(
-        msg.chat.id,
-        "Your phone number is necessary. \nKindly /register again."
+const requestPhoneKeyboard = {
+  reply_markup: {
+    one_time_keyboard: true,
+    keyboard: [
+      [
+        {
+          text: "My phone number",
+          request_contact: true,
+          one_time_keyboard: true
+        }
+      ],
+      ["Cancel"]
+    ]
+  }
+};
+var email;
+bot.onText(/\/participantDetails/, msg => {
+  bot
+    .sendMessage(msg.chat.id, "Enter email", {
+      reply_markup: JSON.stringify({ force_reply: true })
+    })
+    .then(sentMessage => {
+      bot.onReplyToMessage(
+        sentMessage.chat.id,
+        sentMessage.message_id,
+        reply => {
+          console.log(reply.text);
+          email = reply.text;
+          bot.sendMessage(msg.chat.id, 'Please wait while we check out database');
+          //Creating a client and connecting to DB
+          const client = new Client({
+            connectionString: process.env.DATABASE_URL,
+            ssl: true
+          });
+
+          client.connect(err => {
+            if (err) {
+              console.log(err);
+              bot.sendMessage(msg.chat.id, "Something went wrong! Try again");
+              return;
+            } else {
+              console.log("connected!");
+            }
+          });
+          const queryString = `select * from techweek.participant where email='${email}'`
+          client.query(queryString, (err, data)=>{
+            if(err){
+              console.log(err)
+              client.end()
+            }else{
+              var details = data.rows[0];
+              console.log(details.name)
+              console.log(details.email)
+              console.log(details.outstation)
+              console.log(details.phone)
+              console.log(details.id)
+              bot.sendMessage(msg.chat.id, 'These are your details: \n'+
+              'Name: ' + details.name+
+              '\nEmail: ' + details.email+
+              '\nOutstation: ' + details.outstation+
+              '\nParticipation id: ' + details.id)
+              client.end()
+            }
+          })
+        }
       );
-      return;
-    } else {
-      bot
-        .sendMessage(
-          msg.chat.id,
-          "Name: " +
-            msg.chat.first_name +
-            "\nEmail: " +
-            email +
-            "\nOutstation: " +
-            outstation +
-            "\nPhone Number: " +
-            phone_number
-        )
-        .then(sentMessage => {
-          bot.sendMessage(
-            msg.chat.id,
-            "If information is wrong, use /register to reenter. Otherwise use /submitForm to submit"
-          );
-        });
-    }
-  });
+    });
+});
