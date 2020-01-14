@@ -20,6 +20,9 @@ require("./eventRegistration/ppEvent");
 require("./eventRegistration/csoffline")
 require("./eventRegistration/hackathon")
 require("./eventRegistration/blackFlag")
+require("./eventRegistration/informalQuiz")
+require("./eventRegistration/scout")
+require("./eventRegistration/magna")
 
 //start command
 require("./start/start");
