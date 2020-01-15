@@ -46,7 +46,8 @@ bot.onText(/^\/inQuizitive/, msg => {
                   reply => {
                     if (
                       parseInt(reply.text) == NaN ||
-                      parseInt(reply.text) > 3
+                      parseInt(reply.text) > 3 ||
+                      parseInt(reply.text) <= 0
                     ) {
                       bot.sendMessage(
                         msg.chat.id,
@@ -68,7 +69,10 @@ bot.onText(/^\/inQuizitive/, msg => {
                             sentMessage.chat.id,
                             sentMessage.message_id,
                             reply => {
-                              if (parseInt(reply.text) == NaN) {
+                              if (
+                                parseInt(reply.text) == NaN ||
+                                reply.text.length != 9
+                              ) {
                                 bot.sendMessage(
                                   msg.chat.id,
                                   "That seems invalid, Try again /inQuizitive"
@@ -129,7 +133,10 @@ bot.onText(/^\/inQuizitive/, msg => {
                                         sentMessage.chat.id,
                                         sentMessage.message_id,
                                         reply => {
-                                          if (parseInt(reply.text) == NaN) {
+                                          if (
+                                            parseInt(reply.text) == NaN ||
+                                            reply.text.length != 9
+                                          ) {
                                             bot.sendMessage(
                                               msg.chat.id,
                                               "That seems invalid, Try again"
@@ -208,7 +215,8 @@ bot.onText(/^\/inQuizitive/, msg => {
                                                     reply => {
                                                       if (
                                                         parseInt(reply.text) ==
-                                                        NaN
+                                                          NaN ||
+                                                        reply.text.length != 9
                                                       ) {
                                                         bot.sendMessage(
                                                           msg.chat.id,
@@ -323,43 +331,98 @@ function insertInDatabase(msg, tname, id1, id2, id3) {
       console.log("connected!");
     }
   });
-
+  var rowsPresentInDB;
+  var alreadyRegisteredTeam = false;
+  var oneOfThemAlreadyRegistered = false;
+  var neitherHasRegisteredYet = true;
+  var ids = [id1, id2, id3];
+  var checkIfAlreadyPresentQuery = "select * from techweek.informalquiz";
   var createTeamIdQuery = "select count(*) from techweek.informalquiz;";
   var insertQuery =
     "insert into techweek.informalquiz (team_name, leader_name, infoquiz_team_id, id1, id2, id3) values ($1, $2, $3, $4, $5, $6) returning *";
-  client.query(createTeamIdQuery, (err, data) => {
+  client.query(checkIfAlreadyPresentQuery, (err, data) => {
     if (err) {
       console.log(err);
       client.end();
     } else {
-      console.log(data.rows[0].count);
-      teamId = 23000 + parseInt(data.rows[0].count);
-      console.log("Teamid: " + teamId);
-      client.query(
-        insertQuery,
-        [
-          tname,
-          msg.chat.first_name,
-          teamId,
-          id1 == 0 ? null : id1,
-          id2 == 0 ? null : id2,
-          id3 == 0 ? null : id3
-        ],
-        (err, data) => {
+      // console.log(data.rows);
+      rowsPresentInDB = data.rows;
+      rowsPresentInDB.shift();
+      // console.log(ids)
+      // console.log(rowsPresentInDB)
+      rowsPresentInDB.forEach(element => {
+        // console.log(element.id1 + " " + element.id2 + " " + element.id3)
+        // console.log(element.id1)
+
+        //if not -1, then the id already present in this event's database
+        if (
+          ids.indexOf(parseInt(element.id1)) != -1 &&
+          ids.indexOf(parseInt(element.id2)) != -1 &&
+          ids.indexOf(parseInt(element.id3)) != -1 
+        ) {
+          alreadyRegisteredTeam = true;
+        } // client.end();
+        else if (
+          ids.indexOf(parseInt(element.id1)) != -1 ||
+          ids.indexOf(parseInt(element.id2)) != -1 ||
+          ids.indexOf(parseInt(element.id3)) != -1
+        ) {
+          oneOfThemAlreadyRegistered = true;
+        } else {
+          neitherHasRegisteredYet = true;
+        }
+      });
+      if (alreadyRegisteredTeam) {
+        console.log("Team already registered");
+        bot.sendMessage(msg.chat.id, "This team is already registered!");
+        client.end();
+      } else if (oneOfThemAlreadyRegistered) {
+        console.log("At least one of them has already registered!");
+        bot.sendMessage(
+          msg.chat.id,
+          "One of your teammates have already registered for this event with another team. You can be part of only one team!"
+        );
+        client.end();
+      } else if (neitherHasRegisteredYet) {
+        client.query(createTeamIdQuery, (err, data) => {
           if (err) {
             console.log(err);
             client.end();
-            bot.sendMessage(msg.chat.id, "Something went wrong! Try again!");
           } else {
-            console.log("Successful");
-            client.end();
-            bot.sendMessage(
-              msg.chat.id,
-              "You are now registered for inQUIZitive!"
+            console.log(data.rows[0].count);
+            teamId = 23000 + parseInt(data.rows[0].count);
+            console.log("Teamid: " + teamId);
+            client.query(
+              insertQuery,
+              [
+                tname,
+                msg.chat.first_name,
+                teamId,
+                id1 == 0 ? null : id1,
+                id2 == 0 ? null : id2,
+                id3 == 0 ? null : id3
+              ],
+              (err, data) => {
+                if (err) {
+                  console.log(err);
+                  client.end();
+                  bot.sendMessage(
+                    msg.chat.id,
+                    "Something went wrong! Try again!"
+                  );
+                } else {
+                  console.log("Successful");
+                  client.end();
+                  bot.sendMessage(
+                    msg.chat.id,
+                    "You are now registered for inQUIZitive!"
+                  );
+                }
+              }
             );
           }
-        }
-      );
+        });
+      }
     }
   });
 }

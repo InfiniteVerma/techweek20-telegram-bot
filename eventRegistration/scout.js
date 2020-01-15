@@ -71,7 +71,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                             sentMessage.chat.id,
                             sentMessage.message_id,
                             reply => {
-                              if (parseInt(reply.text) == NaN) {
+                              if (parseInt(reply.text) == NaN||reply.text.length != 9) {
                                 bot.sendMessage(
                                   msg.chat.id,
                                   "That seems invalid, Try again /ScoutAbout"
@@ -92,7 +92,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                                       sentMessage.chat.id,
                                       sentMessage.message_id,
                                       reply => {
-                                        if (parseInt(reply.text) == NaN) {
+                                        if (parseInt(reply.text) == NaN||reply.text.length != 9) {
                                           bot.sendMessage(
                                             msg.chat.id,
                                             "That seems invalid, Try again"
@@ -120,7 +120,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                 sentMessage.message_id,
                                                 reply => {
                                                   if (
-                                                    parseInt(reply.text) == NaN
+                                                    parseInt(reply.text) == NaN||reply.text.length != 9
                                                   ) {
                                                     bot.sendMessage(
                                                       msg.chat.id,
@@ -209,7 +209,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                               if (
                                                                 parseInt(
                                                                   reply.text
-                                                                ) == NaN
+                                                                ) == NaN||reply.text.length != 9
                                                               ) {
                                                                 bot.sendMessage(
                                                                   msg.chat.id,
@@ -306,7 +306,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                                               parseInt(
                                                                                 reply.text
                                                                               ) ==
-                                                                              NaN
+                                                                              NaN||reply.text.length != 9
                                                                             ) {
                                                                               bot.sendMessage(
                                                                                 msg
@@ -426,6 +426,12 @@ function insertInDatabase(msg, tname, id1, id2, id3, id4, id5) {
       "id5: " +
       id5
   );
+  var rowsPresentInDB;
+  var alreadyRegisteredTeam = false;
+  var oneOfThemAlreadyRegistered = false;
+  var neitherHasRegisteredYet = true;
+  var ids = [id1, id2, id3, id4, id5];
+  var checkIfAlreadyPresentQuery = "select * from techweek.treasurehunt";
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true
@@ -442,41 +448,93 @@ function insertInDatabase(msg, tname, id1, id2, id3, id4, id5) {
   var createTeamIdQuery = "select count(*) from techweek.treasurehunt;";
   var insertQuery =
     "insert into techweek.treasurehunt (team_name, leader_name, treasurehunt_team_id, id1, id2, id3, id4, id5) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *";
-  client.query(createTeamIdQuery, (err, data) => {
-    if (err) {
-      console.log(err);
-      client.end();
-    } else {
-      console.log(data.rows[0].count);
-      teamId = 24000 + parseInt(data.rows[0].count);
-      console.log("Teamid: " + teamId);
-      client.query(
-        insertQuery,
-        [
-          tname,
-          msg.chat.first_name,
-          teamId,
-          id1 == 0 ? null : id1,
-          id2 == 0 ? null : id2,
-          id3 == 0 ? null : id3,
-          id4 == 0 ? null : id4,
-          id5 == 0 ? null : id5
-        ],
-        (err, data) => {
-          if (err) {
-            console.log(err);
-            client.end();
-            bot.sendMessage(msg.chat.id, "Something went wrong! Try again!");
+    client.query(checkIfAlreadyPresentQuery, (err, data) => {
+      if (err) {
+        console.log(err);
+        client.end();
+      } else {
+        // console.log(data.rows);
+        rowsPresentInDB = data.rows;
+        rowsPresentInDB.shift();
+        // console.log(ids)
+        // console.log(rowsPresentInDB)
+        rowsPresentInDB.forEach(element => {
+          // console.log(element.id1 + " " + element.id2 + " " + element.id3)
+          // console.log(element.id1)
+  
+          //if not -1, then the id already present in this event's database
+          if (
+            ids.indexOf(parseInt(element.id1)) != -1 &&
+            ids.indexOf(parseInt(element.id2)) != -1 &&
+            ids.indexOf(parseInt(element.id3)) != -1 &&
+            ids.indexOf(parseInt(element.id4)) != -1 &&
+            ids.indexOf(parseInt(element.id5)) != -1
+          ) {
+            alreadyRegisteredTeam = true;
+          } // client.end();
+          else if (
+            ids.indexOf(parseInt(element.id1)) != -1 ||
+            ids.indexOf(parseInt(element.id2)) != -1 ||
+            ids.indexOf(parseInt(element.id3)) != -1 ||
+            ids.indexOf(parseInt(element.id4)) != -1 ||
+            ids.indexOf(parseInt(element.id5)) != -1
+          ) {
+            oneOfThemAlreadyRegistered = true;
           } else {
-            console.log("Successful");
-            client.end();
-            bot.sendMessage(
-              msg.chat.id,
-              "You are now registered for ScoutAbout!"
-            );
+            neitherHasRegisteredYet = true;
           }
+        });
+        if (alreadyRegisteredTeam) {
+          console.log("Team already registered");
+          bot.sendMessage(msg.chat.id, "This team is already registered!");
+          client.end();
+        } else if (oneOfThemAlreadyRegistered) {
+          console.log("At least one of them has already registered!");
+          bot.sendMessage(
+            msg.chat.id,
+            "One of your teammates have already registered for this event with another team. You can be part of only one team!"
+          );
+          client.end();
+        } else if (neitherHasRegisteredYet) {
+          client.query(createTeamIdQuery, (err, data) => {
+            if (err) {
+              console.log(err);
+              client.end();
+            } else {
+              console.log(data.rows[0].count);
+              teamId = 24000 + parseInt(data.rows[0].count);
+              console.log("Teamid: " + teamId);
+              client.query(
+                insertQuery,
+                [
+                  tname,
+                  msg.chat.first_name,
+                  teamId,
+                  id1 == 0 ? null : id1,
+                  id2 == 0 ? null : id2,
+                  id3 == 0 ? null : id3,
+                  id4 == 0 ? null : id4,
+                  id5 == 0 ? null : id5
+                ],
+                (err, data) => {
+                  if (err) {
+                    console.log(err);
+                    client.end();
+                    bot.sendMessage(msg.chat.id, "Something went wrong! Try again!");
+                  } else {
+                    console.log("Successful");
+                    client.end();
+                    bot.sendMessage(
+                      msg.chat.id,
+                      "You are now registered for ScoutAbout!"
+                    );
+                  }
+                }
+              );
+            }
+          });
         }
-      );
-    }
-  });
+      }
+    });
 }
+
