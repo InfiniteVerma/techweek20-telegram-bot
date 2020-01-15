@@ -39,7 +39,7 @@ bot.onText(/\/submitForm/, msg => {
   const now = new Date();
   var noOutstation = outstation.toLowerCase() == "yes" ? 1 : 0;
   const getExistingPhoneNumbersQuery = "Select phone from techweek.participant";
-  const findIdQuery = "Select count(*) from techweek.participant";
+  const findIdQuery = "Select max(id) from techweek.participant";
   const insertDataQuery =
     "INSERT INTO techweek.participant(time, name, email, outstation, phone, id) VALUES ($1, $2, $3, $4, $5, $6) returning *";
 
@@ -58,7 +58,8 @@ bot.onText(/\/submitForm/, msg => {
       if (isPresentInDB == true) {
         bot.sendMessage(
           msg.chat.id,
-          "You have already registered as a participant!"
+          "You have already registered as a participant!\n"+
+          "Check out our events: /eventDetails"
         );
         client.end();
         return;
@@ -69,7 +70,7 @@ bot.onText(/\/submitForm/, msg => {
           client.end();
         } else {
           var count = data.rows[0];
-          participant_id = 202046000 + parseInt(count.count);
+          participant_id = 1 + parseInt(count.max);
           client.query(
             insertDataQuery,
             [
@@ -88,7 +89,8 @@ bot.onText(/\/submitForm/, msg => {
               } else {
                 console.log("Successful!");
                 client.end();
-                bot.sendMessage(msg.chat.id, "Entry added in database!");
+                bot.sendMessage(msg.chat.id, "You have successfully registered!\n"+
+                "Check out our events: /eventDetails");
               }
             }
           );

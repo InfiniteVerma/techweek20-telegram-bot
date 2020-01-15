@@ -6,6 +6,13 @@ bot.onText(/\/start/, msg => {
     msg.chat.id,
     "Welcome, " +
       msg.from.first_name +
-      ". Commands available: \n/register\n/eventDetails\n/eventRegistration"
-  );
+      ". I'm NAOMI (Navigare's Autonomous Objective Mobile Interface)." +
+      " I'm here to assist you with the Techweek registration process.\n"
+  ).then(()=>{
+    bot.sendMessage(msg.chat.id, "These are the things I can do: \n" +
+    "1: Individual User Registration /register\n" + 
+    "2: Event Details /eventDetails\n"+
+    "3: Event Registration "
+    )
+  })
 });
