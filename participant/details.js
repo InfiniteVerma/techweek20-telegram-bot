@@ -30,7 +30,10 @@ bot.onText(/\/participantDetails/, msg => {
         reply => {
           console.log(reply.text);
           email = reply.text;
-          bot.sendMessage(msg.chat.id, 'Please wait while we check out database');
+          bot.sendMessage(
+            msg.chat.id,
+            "Please wait while we check out database"
+          );
           //Creating a client and connecting to DB
           const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -46,26 +49,41 @@ bot.onText(/\/participantDetails/, msg => {
               console.log("connected!");
             }
           });
-          const queryString = `select * from techweek.participant where email='${email}'`
-          client.query(queryString, (err, data)=>{
-            if(err){
-              console.log(err)
-              client.end()
-            }else{
+          const queryString = `select * from techweek.participant where email='${email}'`;
+          client.query(queryString, (err, data) => {
+            if (err) {
+              console.log(err);
+              client.end();
+            } else {
               var details = data.rows[0];
-              console.log(details.name)
-              console.log(details.email)
-              console.log(details.outstation)
-              console.log(details.phone)
-              console.log(details.id)
-              bot.sendMessage(msg.chat.id, 'These are your details: \n'+
-              'Name: ' + details.name+
-              '\nEmail: ' + details.email+
-              '\nOutstation: ' + details.outstation+
-              '\nParticipation id: ' + details.id)
-              client.end()
+              if (details == undefined) {
+                bot.sendMessage(
+                  msg.chat.id,
+                  "There is no entry associated with the email: " + email
+                );
+                client.end();
+              } else {
+                console.log(details.name);
+                console.log(details.email);
+                console.log(details.outstation);
+                console.log(details.phone);
+                console.log(details.id);
+                bot.sendMessage(
+                  msg.chat.id,
+                  "These are your details: \n" +
+                    "Name: " +
+                    details.name +
+                    "\nEmail: " +
+                    details.email +
+                    "\nOutstation: " +
+                    details.outstation +
+                    "\nParticipation id: " +
+                    details.id
+                );
+                client.end();
+              }
             }
-          })
+          });
         }
       );
     });
