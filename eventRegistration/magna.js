@@ -19,9 +19,17 @@ bot.onText(/\/MagnaOdeyssey/, msg => {
         sentMessage.chat.id,
         sentMessage.message_id,
         reply => {
-          if (reply.text == "" || parseInt(reply.text) == NaN)
+          if (
+            reply.text == "" ||
+            parseInt(reply.text) == NaN ||
+            reply.text.length != 9
+          ) {
             console.log("That seems invalid, Please try again! /MagnaOdeyssey");
-          else {
+            bot.sendMessage(
+              msg.chat.id,
+              "That seems invalid, Please try again! /MagnaOdeyssey"
+            );
+          } else {
             userid = reply.text;
             bot
               .sendMessage(msg.chat.id, "Should I submit this? ", yesno)
@@ -67,7 +75,8 @@ function insertInDatabase(msg, name, userid) {
   });
   var idIsPresentInDB = false;
   var getAllParticipantIdQuery = "Select id from techweek.participant";
-  var queryString =
+  var checkIfAlreadyRegisteredQuery = `select * from techweek.magna where manga_participant_id=${userid}`;
+  var insertIntoDBQuery =
     "Insert into techweek.magna (name, manga_participant_id) values ($1, $2) returning *";
   client.query(getAllParticipantIdQuery, (err, data) => {
     if (err) {
@@ -82,24 +91,45 @@ function insertInDatabase(msg, name, userid) {
         }
       });
       if (idIsPresentInDB == true) {
-        client.query(
-          queryString,
-          [msg.chat.first_name, userid],
-          (err, data) => {
-            if (err) {
-              console.log(err);
-              client.end();
-              bot.sendMessage(msg.chat.id, "Something went wrong! Try again");
+        client.query(checkIfAlreadyRegisteredQuery, (err, data) => {
+          if (err) {
+            console.log(err);
+            client.end();
+          } else {
+            var ans = data.rows[0];
+            console.log(ans);
+            if (ans == undefined) {
+              console.log("Is not in pp database, inserting");
+              client.query(
+                insertIntoDBQuery,
+                [msg.chat.first_name, userid],
+                (err, data) => {
+                  if (err) {
+                    console.log(err);
+                    client.end();
+                    bot.sendMessage(
+                      msg.chat.id,
+                      "Something went wrong! Try again"
+                    );
+                  } else {
+                    console.log("Successful!");
+                    client.end();
+                    bot.sendMessage(
+                      msg.chat.id,
+                      "You are now registered for MangaOdeyssey!"
+                    );
+                  }
+                }
+              );
             } else {
-              console.log("Successful!");
-              client.end();
               bot.sendMessage(
                 msg.chat.id,
-                "You are now registered for MangaOdeyssey!"
+                "You have already registered for MagnaOdeyssey!"
               );
+              client.end();
             }
           }
-        );
+        });
       } else {
         bot.sendMessage(
           msg.chat.id,
