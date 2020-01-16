@@ -6,14 +6,14 @@ bot.onText(/\/eventDetails/, msg => {
   bot
     .sendMessage(
       msg.chat.id,
-      "These are our events, " +
+      "These are our events in brief, " +
         msg.chat.first_name +
         "\n" +
-        "\nCS: Offline and online" +
-        "\nElectronics: Workshop and Competition" +
-        "\nPaper Presentation" +
-        "\nHackathon" +
-        "\nInformal Events"
+        "\n1. CS: Offline and Online" +
+        "\n2. Electronics: Workshop and Competition" +
+        "\n3. Paper Presentation" +
+        "\n4. Hackathon" +
+        "\n5. Informal Events"
     )
     .then(() => {
       bot.sendMessage(
@@ -25,6 +25,6 @@ bot.onText(/\/eventDetails/, msg => {
           "\nInformals: /informals" +
           "\nPaper Presentation: /paperPres" +
           "\nHackathon: /hackDetails"
-      );
+      )
     });
 });

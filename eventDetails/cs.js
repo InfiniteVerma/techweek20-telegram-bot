@@ -6,5 +6,5 @@ bot.onText(/\/compScience/, msg => {
   "\n2. Expedition - The online coding competition hosted on Hackerrank. Arm yourself with logic and coding for this quest." +
   "\n\nTo register: \n"+
   "1. /CodeQuest"+
-  "\n2. <Link to hackerrank>");
+  "\n2. (Link to competition will be provided later!)");
 });

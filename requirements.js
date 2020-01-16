@@ -13,7 +13,7 @@ require("./eventDetails/graphics")
 require("./participant/details");
 require("./participant/participation1");
 // require("./participant/submitForm");
-
+// require("./start/tips")
 //event registration
 require("./eventRegistration/elecWorkshop");
 require("./eventRegistration/ppEvent");
