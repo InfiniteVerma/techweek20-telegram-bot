@@ -141,7 +141,12 @@ function insertIntoDB(msg, arrayOfTeams) {
                     bot.sendMessage(
                       msg.chat.id,
                       "You are now registered for Scientia!"
-                    );
+                    ).then(() => {
+                      bot.sendMessage(
+                        msg.chat.id,
+                        "Check out other events at /eventDetails or go back to /start"
+                      );
+                    });
                   }
                 }
               );
@@ -149,7 +154,12 @@ function insertIntoDB(msg, arrayOfTeams) {
               bot.sendMessage(
                 msg.chat.id,
                 "You are already registered for Scientia"
-              );
+              ).then(() => {
+                bot.sendMessage(
+                  msg.chat.id,
+                  "Check out other events at /eventDetails or go back to /start"
+                );
+              });
               client.end();
             }
           }

@@ -140,7 +140,13 @@ function insertInDatabase(msg, arrayOfTeams) {
                     bot.sendMessage(
                       msg.chat.id,
                       "You are now registered for MangaOdeyssey!"
+                  )
+                  .then(() => {
+                    bot.sendMessage(
+                      msg.chat.id,
+                      "Check out other events at /eventDetails or go back to /start"
                     );
+                  });
                   }
                 }
               );
@@ -148,7 +154,12 @@ function insertInDatabase(msg, arrayOfTeams) {
               bot.sendMessage(
                 msg.chat.id,
                 "You have already registered for MagnaOdeyssey!"
-              );
+              ).then(() => {
+                bot.sendMessage(
+                  msg.chat.id,
+                  "Check out other events at /eventDetails or go back to /start"
+                );
+              });
               client.end();
             }
           }
@@ -156,8 +167,7 @@ function insertInDatabase(msg, arrayOfTeams) {
       } else {
         bot.sendMessage(
           msg.chat.id,
-          "That particular id is not in our database. Kindly /register before choosing your events"
-        );
+          "That particular id is not in our database. Kindly /register before choosing your events")
       }
     }
   });

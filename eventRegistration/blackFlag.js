@@ -116,7 +116,13 @@ bot.onText(/^\/blackFlag/, msg => {
                                       });
                                       bot.sendMessage(
                                         msg.chat.id,
-                                        tn + ln + i1 + i2 + i3
+                                        "Team name: " +
+                                          tn +
+                                          "\nLeader Name: " +
+                                          ln +
+                                          "\nId1: " +
+                                          i1
+                                        // tn + ln + i1 + i2 + i3
                                       );
                                     })
                                     .then(() => {
@@ -132,7 +138,7 @@ bot.onText(/^\/blackFlag/, msg => {
                                               bot
                                                 .sendMessage(
                                                   msg.chat.id,
-                                                  "Confirmed! Please wait while I enter your details"
+                                                  "Confirmed! Please wait while I enter your details..."
                                                 )
                                                 .then(() => {
                                                   insertInDatabase(
@@ -205,7 +211,14 @@ bot.onText(/^\/blackFlag/, msg => {
                                                   );
                                                   bot.sendMessage(
                                                     msg.chat.id,
-                                                    tn + ln + i1 + i2 + i3
+                                                    "Team name: " +
+                                                      tn +
+                                                      "\nLeader Name: " +
+                                                      ln +
+                                                      "\nId1: " +
+                                                      i1 +
+                                                      "\nId2: " +
+                                                      i2
                                                   );
                                                 })
                                                 .then(() => {
@@ -225,7 +238,7 @@ bot.onText(/^\/blackFlag/, msg => {
                                                             bot
                                                               .sendMessage(
                                                                 msg.chat.id,
-                                                                "Confirmed! Please wait while I enter your details"
+                                                                "Confirmed! Please wait while I enter your details..."
                                                               )
                                                               .then(() => {
                                                                 insertInDatabase(
@@ -324,10 +337,15 @@ bot.onText(/^\/blackFlag/, msg => {
                                                               bot
                                                                 .sendMessage(
                                                                   msg.chat.id,
-                                                                  tn +
+                                                                  "Team name: " +
+                                                                    tn +
+                                                                    "\nLeader Name: " +
                                                                     ln +
+                                                                    "\nId1: " +
                                                                     i1 +
+                                                                    "\nId2: " +
                                                                     i2 +
+                                                                    "\nId3: " +
                                                                     i3
                                                                 )
                                                                 .then(() => {
@@ -352,7 +370,7 @@ bot.onText(/^\/blackFlag/, msg => {
                                                                                   msg
                                                                                     .chat
                                                                                     .id,
-                                                                                  "Confirmed! Please wait while I enter your details"
+                                                                                  "Confirmed! Please wait while I enter your details..."
                                                                                 )
                                                                                 .then(
                                                                                   () => {
@@ -370,9 +388,6 @@ bot.onText(/^\/blackFlag/, msg => {
                                                                               bot.sendMessage(
                                                                                 msg
                                                                                   .chat
-    
-    
-    
                                                                                   .id,
                                                                                 "Ok. Try filling the form again by /blackFlag."
                                                                               );
@@ -447,7 +462,8 @@ function insertInDatabase(msg, arrayOfTeams) {
   var neitherHasRegisteredYet = true;
   var ids = [id1, id2, id3];
   var checkIfAlreadyPresentQuery = "select * from techweek.blackflag";
-  var createTeamIdQuery = "select count(*) from techweek.blackflag;";
+  var createTeamIdQuery =
+    "select max(blackflag_team_id) from techweek.blackflag;";
   var insertQuery =
     "insert into techweek.blackflag (team_name, leader_name, blackflag_team_id, id1, id2, id3) values ($1, $2, $3, $4, $5, $6) returning *";
   client.query(checkIfAlreadyPresentQuery, (err, data) => {
@@ -484,14 +500,28 @@ function insertInDatabase(msg, arrayOfTeams) {
       });
       if (alreadyRegisteredTeam) {
         console.log("Team already registered");
-        bot.sendMessage(msg.chat.id, "This team is already registered!");
+        bot
+          .sendMessage(msg.chat.id, "This team is already registered!")
+          .then(() => {
+            bot.sendMessage(
+              msg.chat.id,
+              "Check out other events at /eventDetails or go back to /start"
+            );
+          });
         client.end();
       } else if (oneOfThemAlreadyRegistered) {
         console.log("At least one of them has already registered!");
-        bot.sendMessage(
-          msg.chat.id,
-          "One of your teammates have already registered for this event with another team. You can be part of only one team!"
-        );
+        bot
+          .sendMessage(
+            msg.chat.id,
+            "Event registration unsuccessful!\nOne of your teammates (or you) have already registered for this event with another team. You can be part of only one team!"
+          )
+          .then(() => {
+            bot.sendMessage(
+              msg.chat.id,
+              "Try again: /blackFlag or check out other events at /eventDetails or go back to /start"
+            );
+          });
         client.end();
       } else if (neitherHasRegisteredYet) {
         client.query(createTeamIdQuery, (err, data) => {
@@ -499,8 +529,8 @@ function insertInDatabase(msg, arrayOfTeams) {
             console.log(err);
             client.end();
           } else {
-            console.log(data.rows[0].count);
-            teamId = 21000 + parseInt(data.rows[0].count);
+            console.log(data.rows[0].max);
+            teamId = 1 + parseInt(data.rows[0].max);
             console.log("Teamid: " + teamId);
             client.query(
               insertQuery,
@@ -518,15 +548,25 @@ function insertInDatabase(msg, arrayOfTeams) {
                   client.end();
                   bot.sendMessage(
                     msg.chat.id,
-                    "Something went wrong! Try again!"
+                    "Something went wrong. Try again!"
                   );
                 } else {
                   console.log("Successful");
                   client.end();
-                  bot.sendMessage(
-                    msg.chat.id,
-                    "You are now registered for BlackFlag!"
-                  );
+                  bot
+                    .sendMessage(
+                      msg.chat.id,
+                      "You are now registered for BlackFlag!\n" +
+                        "Your event participation id is: " +
+                        teamId +
+                        "\nPlease take a note of it!"
+                    )
+                    .then(() => {
+                      bot.sendMessage(
+                        msg.chat.id,
+                        "Check out other events at /eventDetails or go back to /start"
+                      );
+                    });
                 }
               }
             );

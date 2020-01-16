@@ -198,13 +198,16 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                           );
                                                           bot.sendMessage(
                                                             msg.chat.id,
-                                                            tn +
+                                                            "Team name: " +
+                                                              tn +
+                                                              "\nLeader Name: " +
                                                               ln +
+                                                              "\nId1: " +
                                                               i1 +
+                                                              "\nId2: " +
                                                               i2 +
-                                                              i3 +
-                                                              i4 +
-                                                              i5
+                                                              "\nId3: " +
+                                                              i3
                                                           );
                                                         })
                                                         .then(() => {
@@ -244,7 +247,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                                     bot.sendMessage(
                                                                       msg.chat
                                                                         .id,
-                                                                      "Ok. Try filling the form again by /blackFlag."
+                                                                      "Ok. Try filling the form again by /ScoutAbout."
                                                                     );
                                                                     arrayOfTeams.shift();
                                                                     console.log(
@@ -349,13 +352,18 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                                             msg
                                                                               .chat
                                                                               .id,
-                                                                            tn +
+                                                                              "Team name: " +
+                                                                              tn +
+                                                                              "\nLeader Name: " +
                                                                               ln +
+                                                                              "\nId1: " +
                                                                               i1 +
+                                                                              "\nId2: " +
                                                                               i2 +
+                                                                              "\nId3: " +
                                                                               i3 +
-                                                                              i4 +
-                                                                              i5
+                                                                              "\nId4: " +
+                                                                              i4
                                                                           )
 
                                                                           .then(
@@ -401,7 +409,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                                                             msg
                                                                                               .chat
                                                                                               .id,
-                                                                                            "Ok. Try filling the form again by /blackFlag."
+                                                                                            "Ok. Try filling the form again by /ScoutAbout."
                                                                                           );
                                                                                           arrayOfTeams.shift();
                                                                                           console.log(
@@ -419,7 +427,9 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                                 } else if (
                                                                   teamSize === 5
                                                                 ) {
-                                                                  arrayOfTeams.push(team)
+                                                                  arrayOfTeams.push(
+                                                                    team
+                                                                  );
                                                                   bot
                                                                     .sendMessage(
                                                                       msg.chat
@@ -487,7 +497,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                                                       i2,
                                                                                       i3,
                                                                                       i4,
-                                                                                    i5;
+                                                                                      i5;
                                                                                     arrayOfTeams.forEach(
                                                                                       element => {
                                                                                         if (
@@ -518,12 +528,19 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                                                         msg
                                                                                           .chat
                                                                                           .id,
-                                                                                        tn +
+                                                                                          "Team name: " +
+                                                                                          tn +
+                                                                                          "\nLeader Name: " +
                                                                                           ln +
+                                                                                          "\nId1: " +
                                                                                           i1 +
+                                                                                          "\nId2: " +
                                                                                           i2 +
+                                                                                          "\nId3: " +
                                                                                           i3 +
+                                                                                          "\nId4: " +
                                                                                           i4 +
+                                                                                          "\nId5: " +
                                                                                           i5
                                                                                       )
                                                                                       // })
@@ -570,7 +587,7 @@ bot.onText(/\/ScoutAbout/, msg => {
                                                                                                         msg
                                                                                                           .chat
                                                                                                           .id,
-                                                                                                        "Ok. Try filling the form again by /blackFlag."
+                                                                                                        "Ok. Try filling the form again by /ScoutAbout."
                                                                                                       );
                                                                                                       arrayOfTeams.shift();
                                                                                                       console.log(
@@ -665,7 +682,8 @@ function insertInDatabase(msg, arrayOfTeams) {
       console.log("connected!");
     }
   });
-  var createTeamIdQuery = "select count(*) from techweek.treasurehunt;";
+  var createTeamIdQuery =
+    "select max(treasurehunt_team_id) from techweek.treasurehunt;";
   var insertQuery =
     "insert into techweek.treasurehunt (team_name, leader_name, treasurehunt_team_id, id1, id2, id3, id4, id5) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *";
   client.query(checkIfAlreadyPresentQuery, (err, data) => {
@@ -706,14 +724,28 @@ function insertInDatabase(msg, arrayOfTeams) {
       });
       if (alreadyRegisteredTeam) {
         console.log("Team already registered");
-        bot.sendMessage(msg.chat.id, "This team is already registered!");
+        bot
+          .sendMessage(msg.chat.id, "This team is already registered!")
+          .then(() => {
+            bot.sendMessage(
+              msg.chat.id,
+              "Check out other events at /eventDetails or go back to /start"
+            );
+          });
         client.end();
       } else if (oneOfThemAlreadyRegistered) {
         console.log("At least one of them has already registered!");
-        bot.sendMessage(
-          msg.chat.id,
-          "One of your teammates have already registered for this event with another team. You can be part of only one team!"
-        );
+        bot
+          .sendMessage(
+            msg.chat.id,
+            "Event registration unsuccessful!\nOne of your teammates have already registered for this event with another team. You can be part of only one team!"
+          )
+          .then(() => {
+            bot.sendMessage(
+              msg.chat.id,
+              "Try again: /ScoutAbout or check out other events at /eventDetails or go back to /start"
+            );
+          });
         client.end();
       } else if (neitherHasRegisteredYet) {
         client.query(createTeamIdQuery, (err, data) => {
@@ -721,8 +753,8 @@ function insertInDatabase(msg, arrayOfTeams) {
             console.log(err);
             client.end();
           } else {
-            console.log(data.rows[0].count);
-            teamId = 24000 + parseInt(data.rows[0].count);
+            console.log(data.rows[0].max);
+            teamId = 1 + parseInt(data.rows[0].max);
             console.log("Teamid: " + teamId);
             client.query(
               insertQuery,
@@ -747,10 +779,20 @@ function insertInDatabase(msg, arrayOfTeams) {
                 } else {
                   console.log("Successful");
                   client.end();
-                  bot.sendMessage(
-                    msg.chat.id,
-                    "You are now registered for ScoutAbout!"
-                  );
+                  bot
+                    .sendMessage(
+                      msg.chat.id,
+                      "You are now registered for ScoutAbout!" +
+                        "Your event participation id is: " +
+                        teamId +
+                        "\nPlease take a note of it!"
+                    )
+                    .then(() => {
+                      bot.sendMessage(
+                        msg.chat.id,
+                        "Check out other events at /eventDetails or go back to /start"
+                      );
+                    });
                 }
               }
             );

@@ -44,7 +44,7 @@ bot.onText(/\/InnovativeEdge/, msg => {
               .sendMessage(msg.chat.id, "Should I submit this? ", yesno)
               .then(() => {
                 bot.once("message", answer => {
-                  arrayOfTeams.push(team)
+                  arrayOfTeams.push(team);
                   if (answer.text == "Yes") {
                     bot
                       .sendMessage(
@@ -52,9 +52,9 @@ bot.onText(/\/InnovativeEdge/, msg => {
                         "Confirmed! Please wait while I enter your details"
                       )
                       .then(() => {
-                        insertIntoDB(msg, arrayOfTeams)
-                        arrayOfTeams.shift()
-                        console.log(arrayOfTeams)
+                        insertIntoDB(msg, arrayOfTeams);
+                        arrayOfTeams.shift();
+                        console.log(arrayOfTeams);
                       });
                   } else {
                     bot.sendMessage(
@@ -62,7 +62,7 @@ bot.onText(/\/InnovativeEdge/, msg => {
                       "Ok. Try filling the form again by /InnovativeEdge."
                     );
                     arrayOfTeams.shift();
-                    console.log(arrayOfTeams)
+                    console.log(arrayOfTeams);
                   }
                 });
               });
@@ -72,7 +72,7 @@ bot.onText(/\/InnovativeEdge/, msg => {
     });
 });
 
-function insertIntoDB(msg, arrayOfTeams){
+function insertIntoDB(msg, arrayOfTeams) {
   var id1, leaderName;
   arrayOfTeams.forEach(element => {
     if (msg.chat.id == element.id) {
@@ -81,7 +81,7 @@ function insertIntoDB(msg, arrayOfTeams){
       // phone_number = element.phone_number;
     }
   });
-  console.log("Name: " + leaderName + "userid: " + userid)
+  console.log("Name: " + leaderName + "userid: " + userid);
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true
@@ -89,18 +89,14 @@ function insertIntoDB(msg, arrayOfTeams){
   client.connect(err => {
     if (err) {
       console.log(err);
-      bot.sendMessage(
-        msg.chat.id,
-        "Something went wrong! Try again"
-      );
+      bot.sendMessage(msg.chat.id, "Something went wrong! Try again");
       return;
     } else {
       console.log("connected!");
     }
   });
   var idIsPresentInDB = false;
-  var getAllParticipantIdQuery =
-    "Select id from techweek.participant";
+  var getAllParticipantIdQuery = "Select id from techweek.participant";
   var checkIfAlreadyRegisteredQuery = `select * from techweek.ppevent where ppevent_participant_id= (${userid})`;
   var insertIntoDBQuery =
     "Insert into techweek.ppevent (name, ppevent_participant_id) values ($1, $2) returning *";
@@ -112,58 +108,64 @@ function insertIntoDB(msg, arrayOfTeams){
       var idList = data.rows;
       console.log(idList);
       idList.forEach(element => {
-        if (
-          element.id == parseInt(userid) &&
-          element.id != 202046000
-        ) {
+        if (element.id == parseInt(userid) && element.id != 202046000) {
           idIsPresentInDB = true;
         }
       });
       if (idIsPresentInDB == true) {
-        client.query(
-          checkIfAlreadyRegisteredQuery,
-          (err, data) => {
-            if (err) {
-              console.log(err);
-              client.end();
-            } else {
-              var ans = data.rows[0];
-              console.log(ans);
-              if (ans == undefined) {
-                console.log(
-                  "Is not in pp database, inserting"
-                );
-                client.query(
-                  insertIntoDBQuery,
-                  [leaderName, id1],
-                  (err, data) => {
-                    if (err) {
-                      console.log(err);
-                      client.end();
-                      bot.sendMessage(
-                        msg.chat.id,
-                        "Something went wrong! Try again"
-                      );
-                    } else {
-                      console.log("Successful!");
-                      client.end();
-                      bot.sendMessage(
+        client.query(checkIfAlreadyRegisteredQuery, (err, data) => {
+          if (err) {
+            console.log(err);
+            client.end();
+          } else {
+            var ans = data.rows[0];
+            console.log(ans);
+            if (ans == undefined) {
+              console.log("Is not in pp database, inserting");
+              client.query(
+                insertIntoDBQuery,
+                [leaderName, id1],
+                (err, data) => {
+                  if (err) {
+                    console.log(err);
+                    client.end();
+                    bot.sendMessage(
+                      msg.chat.id,
+                      "Something went wrong! Try again"
+                    );
+                  } else {
+                    console.log("Successful!");
+                    client.end();
+                    bot
+                      .sendMessage(
                         msg.chat.id,
                         "You are now registered for Innovative Edge!"
-                      );
-                    }
+                      )
+                      .then(() => {
+                        bot.sendMessage(
+                          msg.chat.id,
+                          "Check out other events at /eventDetails or go back to /start"
+                        );
+                      });
                   }
-                );
-              } else {
-                bot.sendMessage(
+                }
+              );
+            } else {
+              bot
+                .sendMessage(
                   msg.chat.id,
                   "You are already registered for InnovativeEdge!"
-                );
-                client.end();
-              }
+                )
+                .then(() => {
+                  bot.sendMessage(
+                    msg.chat.id,
+                    "Check out other events at /eventDetails or go back to /start"
+                  );
+                });
+              client.end();
             }
           }
-        );
+        });
       } else {
         bot.sendMessage(
           msg.chat.id,

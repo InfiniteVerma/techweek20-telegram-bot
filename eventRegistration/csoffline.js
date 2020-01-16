@@ -118,7 +118,12 @@ bot.onText(/^\/CodeQuest/, msg => {
                                       });
                                       bot.sendMessage(
                                         msg.chat.id,
-                                        tn + ln + i1 + i2
+                                        "Team name: " +
+                                          tn +
+                                          "\nLeader Name: " +
+                                          ln +
+                                          "\nId1: " +
+                                          i1
                                       );
                                     })
                                     .then(() => {
@@ -136,7 +141,7 @@ bot.onText(/^\/CodeQuest/, msg => {
                                               bot
                                                 .sendMessage(
                                                   msg.chat.id,
-                                                  "Confirmed! Please wait while i submit your details"
+                                                  "Confirmed! Please wait while I submit your details..."
                                                 )
                                                 .then(() => {
                                                   // console.log(tname+" "+ m11sg.chat.first_name+" "+teamId+" " + id1+" " + null)
@@ -209,7 +214,14 @@ bot.onText(/^\/CodeQuest/, msg => {
                                                   );
                                                   bot.sendMessage(
                                                     msg.chat.id,
-                                                    tn + ln + i1 + i2
+                                                    "Team name: " +
+                                                      tn +
+                                                      "\nLeader Name: " +
+                                                      ln +
+                                                      "\nId1: " +
+                                                      i1 +
+                                                      "\nId2: " +
+                                                      i2
                                                   );
                                                 })
                                                 .then(() => {
@@ -233,7 +245,7 @@ bot.onText(/^\/CodeQuest/, msg => {
                                                             bot
                                                               .sendMessage(
                                                                 msg.chat.id,
-                                                                "Confirmed! Please wait while i submit your details"
+                                                                "Confirmed! Please wait while I submit your details..."
                                                               )
                                                               .then(() => {
                                                                 insertInDatabase(
@@ -310,7 +322,8 @@ function insertInDatabase(msg, arrayOfTeams) {
   var neitherHasRegisteredYet = true;
   var ids = [id1, id2];
   var checkIfAlreadyPresentQuery = "select * from techweek.csoffline";
-  var createTeamIdQuery = "select count(*) from techweek.csoffline;";
+  var createTeamIdQuery =
+    "select max(csoffline_team_id) from techweek.csoffline;";
   var insertQuery =
     "INSERT INTO techweek.csoffline(team_name, leader_name, csoffline_team_id, id1, id2) VALUES ($1, $2, $3, $4, $5) returning *";
   client.query(checkIfAlreadyPresentQuery, (err, data) => {
@@ -344,14 +357,28 @@ function insertInDatabase(msg, arrayOfTeams) {
       });
       if (alreadyRegisteredTeam) {
         console.log("Team already registered");
-        bot.sendMessage(msg.chat.id, "This team is already registered!");
+        bot
+          .sendMessage(msg.chat.id, "This team is already registered!")
+          .then(() => {
+            bot.sendMessage(
+              msg.chat.id,
+              "Check out other events at /eventDetails or go back to /start"
+            );
+          });
         client.end();
       } else if (oneOfThemAlreadyRegistered) {
         console.log("At least one of them has already registered!");
-        bot.sendMessage(
-          msg.chat.id,
-          "One of your teammates have already registered for this event with another team. You can be part of only one team!"
-        );
+        bot
+          .sendMessage(
+            msg.chat.id,
+            "One of your teammates have already registered for this event with another team. You can be part of only one team!"
+          )
+          .then(() => {
+            bot.sendMessage(
+              msg.chat.id,
+              "Try again: /codeQuest or check out other events at /eventDetails or go back to /start"
+            );
+          });
         client.end();
       } else if (neitherHasRegisteredYet) {
         console.log("neither");
@@ -360,8 +387,8 @@ function insertInDatabase(msg, arrayOfTeams) {
             console.log(err);
             client.end();
           } else {
-            console.log(data.rows[0].count);
-            teamId = 26000 + parseInt(data.rows[0].count);
+            console.log(data.rows[0].max);
+            teamId = 1 + parseInt(data.rows[0].max);
             console.log("Teamid: " + teamId);
             client.query(
               insertQuery,
@@ -383,10 +410,20 @@ function insertInDatabase(msg, arrayOfTeams) {
                 } else {
                   console.log("Successful");
                   client.end();
-                  bot.sendMessage(
-                    msg.chat.id,
-                    "You are now registered for CodeQuest!"
-                  );
+                  bot
+                    .sendMessage(
+                      msg.chat.id,
+                      "You are now registered for CodeQuest!\n" +
+                        "Your event participation id is: " +
+                        teamId +
+                        "\nPlease take a note of it!"
+                    )
+                    .then(() => {
+                      bot.sendMessage(
+                        msg.chat.id,
+                        "Check out other events at /eventDetails or go back to /start"
+                      );
+                    });
                 }
               }
             );

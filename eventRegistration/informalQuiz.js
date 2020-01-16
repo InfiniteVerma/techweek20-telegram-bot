@@ -114,7 +114,12 @@ bot.onText(/^\/inQuizitive/, msg => {
                                       });
                                       bot.sendMessage(
                                         msg.chat.id,
-                                        tn + ln + i1 + i2 + i3
+                                        "Team name: " +
+                                          tn +
+                                          "\nLeader Name: " +
+                                          ln +
+                                          "\nId1: " +
+                                          i1
                                       );
                                     })
                                     .then(() => {
@@ -143,10 +148,10 @@ bot.onText(/^\/inQuizitive/, msg => {
                                             } else {
                                               bot.sendMessage(
                                                 msg.chat.id,
-                                                "Ok. Try filling the form again by /blackFlag."
+                                                "Ok. Try filling the form again by /inQuizitive."
                                               );
                                               arrayOfTeams.shift();
-                                              console.log(arrayOfTeams)
+                                              console.log(arrayOfTeams);
                                             }
                                           });
                                         });
@@ -186,29 +191,34 @@ bot.onText(/^\/inQuizitive/, msg => {
                                                   "Confirm Details"
                                                 )
                                                 .then(() => {
-                                                    // .then(() => {
-                                                      var tn, ln, i1, i2, i3;
-                                                      arrayOfTeams.forEach(
-                                                        element => {
-                                                          if (
-                                                            element.id ==
-                                                            msg.chat.id
-                                                          ) {
-                                                            tn =
-                                                              element.teamName;
-                                                            ln =
-                                                              element.leaderName;
-                                                            i1 = element.id1;
-                                                            i2 = element.id2;
-                                                            i3 = element.id3;
-                                                          }
-                                                        }
-                                                      );
-                                                      bot.sendMessage(
-                                                        msg.chat.id,
-                                                        tn + ln + i1 + i2 + i3
-                                                      );
-                                                    // });
+                                                  // .then(() => {
+                                                  var tn, ln, i1, i2, i3;
+                                                  arrayOfTeams.forEach(
+                                                    element => {
+                                                      if (
+                                                        element.id ==
+                                                        msg.chat.id
+                                                      ) {
+                                                        tn = element.teamName;
+                                                        ln = element.leaderName;
+                                                        i1 = element.id1;
+                                                        i2 = element.id2;
+                                                        i3 = element.id3;
+                                                      }
+                                                    }
+                                                  );
+                                                  bot.sendMessage(
+                                                    msg.chat.id,
+                                                    "Team name: " +
+                                                      tn +
+                                                      "\nLeader Name: " +
+                                                      ln +
+                                                      "\nId1: " +
+                                                      i1 +
+                                                      "\nId2: " +
+                                                      i2
+                                                  );
+                                                  // });
                                                 })
                                                 .then(() => {
                                                   bot
@@ -229,21 +239,25 @@ bot.onText(/^\/inQuizitive/, msg => {
                                                                 msg.chat.id,
                                                                 "Confirmed! Please wait while I enter your details"
                                                               )
-                                                              .then(() =>{
+                                                              .then(() => {
                                                                 insertInDatabase(
                                                                   msg,
                                                                   arrayOfTeams
                                                                 );
                                                                 arrayOfTeams.shift();
-                                                                console.log(arrayOfTeams)
+                                                                console.log(
+                                                                  arrayOfTeams
+                                                                );
                                                               });
                                                           } else {
                                                             bot.sendMessage(
                                                               msg.chat.id,
-                                                              "Ok. Try filling the form again by /blackFlag."
+                                                              "Ok. Try filling the form again by /inQuizitive."
                                                             );
-                                                            arrayOfTeams.shift()
-                                                            console.log(arrayOfTeams)
+                                                            arrayOfTeams.shift();
+                                                            console.log(
+                                                              arrayOfTeams
+                                                            );
                                                           }
                                                         }
                                                       );
@@ -283,10 +297,12 @@ bot.onText(/^\/inQuizitive/, msg => {
                                                           reply.text
                                                         );
                                                         str += "\nid3: " + id3;
-                                                        team.id3 = id3
+                                                        team.id3 = id3;
                                                         console.log(reply.text);
                                                         if (teamSize === 3) {
-                                                          arrayOfTeams.push(team)
+                                                          arrayOfTeams.push(
+                                                            team
+                                                          );
                                                           bot
                                                             .sendMessage(
                                                               msg.chat.id,
@@ -320,59 +336,72 @@ bot.onText(/^\/inQuizitive/, msg => {
                                                               bot
                                                                 .sendMessage(
                                                                   msg.chat.id,
-                                                                  tn +
+                                                                  "Team name: " +
+                                                                    tn +
+                                                                    "\nLeader Name: " +
                                                                     ln +
+                                                                    "\nId1: " +
                                                                     i1 +
+                                                                    "\nId2: " +
                                                                     i2 +
+                                                                    "\nId3: " +
                                                                     i3
                                                                 )
-                                                            // })
-                                                            .then(() => {
-                                                              bot
-                                                                .sendMessage(
-                                                                  msg.chat.id,
-                                                                  "Should I submit this? ",
-                                                                  yesno
-                                                                )
+                                                                // })
                                                                 .then(() => {
-                                                                  bot.once(
-                                                                    "message",
-                                                                    answer => {
-                                                                      if (
-                                                                        answer.text ==
-                                                                        "Yes"
-                                                                      ) {
-                                                                        bot
-                                                                          .sendMessage(
-                                                                            msg
-                                                                              .chat
-                                                                              .id,
-                                                                            "Confirmed! Please wait while I enter your details"
-                                                                          )
-                                                                          .then(
-                                                                            () =>{
-                                                                              insertInDatabase(
-                                                                                msg,
+                                                                  bot
+                                                                    .sendMessage(
+                                                                      msg.chat
+                                                                        .id,
+                                                                      "Should I submit this? ",
+                                                                      yesno
+                                                                    )
+                                                                    .then(
+                                                                      () => {
+                                                                        bot.once(
+                                                                          "message",
+                                                                          answer => {
+                                                                            if (
+                                                                              answer.text ==
+                                                                              "Yes"
+                                                                            ) {
+                                                                              bot
+                                                                                .sendMessage(
+                                                                                  msg
+                                                                                    .chat
+                                                                                    .id,
+                                                                                  "Confirmed! Please wait while I enter your details"
+                                                                                )
+                                                                                .then(
+                                                                                  () => {
+                                                                                    insertInDatabase(
+                                                                                      msg,
+                                                                                      arrayOfTeams
+                                                                                    );
+                                                                                    arrayOfTeams.shift();
+                                                                                    console.log(
+                                                                                      arrayOfTeams
+                                                                                    );
+                                                                                  }
+                                                                                );
+                                                                            } else {
+                                                                              bot.sendMessage(
+                                                                                msg
+                                                                                  .chat
+                                                                                  .id,
+                                                                                "Ok. Try filling the form again by /inQuizitive."
+                                                                              );
+                                                                              arrayOfTeams.shift();
+                                                                              console.log(
                                                                                 arrayOfTeams
                                                                               );
-                                                                              arrayOfTeams.shift()
-                                                                              console.log(arrayOfTeams)
-                                                                            });
-                                                                      } else {
-                                                                        bot.sendMessage(
-                                                                          msg
-                                                                            .chat
-                                                                            .id,
-                                                                          "Ok. Try filling the form again by /blackFlag."
+                                                                            }
+                                                                          }
                                                                         );
-                                                                        arrayOfTeams.shift()
-                                                                        console.log(arrayOfTeams)
                                                                       }
-                                                                    }
-                                                                  );
+                                                                    );
                                                                 });
                                                             });
-                                                          });
                                                         }
                                                       }
                                                     }
@@ -433,7 +462,8 @@ function insertInDatabase(msg, arrayOfTeams) {
   var neitherHasRegisteredYet = true;
   var ids = [id1, id2, id3];
   var checkIfAlreadyPresentQuery = "select * from techweek.informalquiz";
-  var createTeamIdQuery = "select count(*) from techweek.informalquiz;";
+  var createTeamIdQuery =
+    "select max(infoquiz_team_id) from techweek.informalquiz;";
   var insertQuery =
     "insert into techweek.informalquiz (team_name, leader_name, infoquiz_team_id, id1, id2, id3) values ($1, $2, $3, $4, $5, $6) returning *";
   client.query(checkIfAlreadyPresentQuery, (err, data) => {
@@ -470,14 +500,28 @@ function insertInDatabase(msg, arrayOfTeams) {
       });
       if (alreadyRegisteredTeam) {
         console.log("Team already registered");
-        bot.sendMessage(msg.chat.id, "This team is already registered!");
+        bot
+          .sendMessage(msg.chat.id, "This team is already registered!")
+          .then(() => {
+            bot.sendMessage(
+              msg.chat.id,
+              "Check out other events at /eventDetails or go back to /start"
+            );
+          });
         client.end();
       } else if (oneOfThemAlreadyRegistered) {
         console.log("At least one of them has already registered!");
-        bot.sendMessage(
-          msg.chat.id,
-          "One of your teammates have already registered for this event with another team. You can be part of only one team!"
-        );
+        bot
+          .sendMessage(
+            msg.chat.id,
+            "Event registration unsuccessful!\nOne of your teammates have already registered for this event with another team. You can be part of only one team!"
+          )
+          .then(() => {
+            bot.sendMessage(
+              msg.chat.id,
+              "Try again: /inQuizitive or check out other events at /eventDetails or go back to /start"
+            );
+          });
         client.end();
       } else if (neitherHasRegisteredYet) {
         client.query(createTeamIdQuery, (err, data) => {
@@ -485,8 +529,8 @@ function insertInDatabase(msg, arrayOfTeams) {
             console.log(err);
             client.end();
           } else {
-            console.log(data.rows[0].count);
-            teamId = 23000 + parseInt(data.rows[0].count);
+            console.log(data.rows[0].max);
+            teamId = 23000 + parseInt(data.rows[0].max);
             console.log("Teamid: " + teamId);
             client.query(
               insertQuery,
@@ -509,10 +553,20 @@ function insertInDatabase(msg, arrayOfTeams) {
                 } else {
                   console.log("Successful");
                   client.end();
-                  bot.sendMessage(
-                    msg.chat.id,
-                    "You are now registered for inQUIZitive!"
-                  );
+                  bot
+                    .sendMessage(
+                      msg.chat.id,
+                      "You are now registered for inQUIZitive!\n" +
+                        "Your event participation id is: " +
+                        teamId +
+                        "\nPlease take a note of it!"
+                    )
+                    .then(() => {
+                      bot.sendMessage(
+                        msg.chat.id,
+                        "Check out other events at /eventDetails or go back to /start"
+                      );
+                    });
                 }
               }
             );
