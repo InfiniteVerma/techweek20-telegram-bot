@@ -8,7 +8,19 @@ var yesno = {
     // }
   }
 };
+var team = {};
+var arrayOfTeams = [];
 bot.onText(/^\/CodeQuest/, msg => {
+  team = {
+    id: "id",
+    leaderName: "leaderName",
+    teamName: "teamName",
+    teamSize: "teamSize",
+    id1: "0",
+    id2: "0"
+  };
+  team.id = msg.chat.id;
+  team.leaderName = msg.chat.first_name;
   var id1 = 0;
   var id2 = 0;
   var teamId = 0;
@@ -33,6 +45,7 @@ bot.onText(/^\/CodeQuest/, msg => {
           } else {
             tname = reply.text;
             str += "\nTeam name: " + tname;
+            team.teamName = tname;
             console.log(reply.text);
             bot
               .sendMessage(
@@ -63,7 +76,7 @@ bot.onText(/^\/CodeQuest/, msg => {
                       teamSize = parseInt(reply.text);
                       str += "\nTeam Size: " + teamSize;
                       console.log(reply.text);
-
+                      team.teamSize = teamSize;
                       //after entering team size (1/2)
                       //ask for id1...
                       bot
@@ -87,13 +100,27 @@ bot.onText(/^\/CodeQuest/, msg => {
                               else {
                                 id1 = parseInt(reply.text);
                                 str += "\nid1: " + id1;
+                                team.id1 = id1;
                                 console.log(reply.text);
                                 if (teamSize === 1) {
+                                  arrayOfTeams.push(team);
                                   bot
                                     .sendMessage(msg.chat.id, "Confirm Details")
-                                    .then(() =>
-                                      bot.sendMessage(msg.chat.id, str)
-                                    )
+                                    .then(() => {
+                                      var tn, ln, i1, i2;
+                                      arrayOfTeams.forEach(element => {
+                                        if (element.id == msg.chat.id) {
+                                          tn = element.teamName;
+                                          ln = element.leaderName;
+                                          i1 = element.id1;
+                                          i2 = element.id2;
+                                        }
+                                      });
+                                      bot.sendMessage(
+                                        msg.chat.id,
+                                        tn + ln + i1 + i2
+                                      );
+                                    })
                                     .then(() => {
                                       bot
                                         .sendMessage(
@@ -115,17 +142,18 @@ bot.onText(/^\/CodeQuest/, msg => {
                                                   // console.log(tname+" "+ m11sg.chat.first_name+" "+teamId+" " + id1+" " + null)
                                                   insertInDatabase(
                                                     msg,
-                                                    msg.chat.first_name,
-                                                    tname,
-                                                    id1,
-                                                    id2
+                                                    arrayOfTeams
                                                   );
+                                                  arrayOfTeams.shift();
+                                                  console.log(arrayOfTeams);
                                                 });
                                             } else if (answer.text == "No") {
                                               bot.sendMessage(
                                                 msg.chat.id,
                                                 "Ok. Try entering the details again /CodeQuest"
                                               );
+                                              arrayOfTeams.shift();
+                                              console.log(arrayOfTeams);
                                             }
                                           });
                                         });
@@ -155,13 +183,35 @@ bot.onText(/^\/CodeQuest/, msg => {
                                           else {
                                             id2 = parseInt(reply.text);
                                             str += "\nid2: " + id2;
+                                            team.id2 = id2;
                                             console.log(reply.text);
                                             if (teamSize === 2) {
+                                              arrayOfTeams.push(team);
                                               bot
                                                 .sendMessage(
                                                   msg.chat.id,
                                                   "Confirm Details"
                                                 )
+                                                .then(() => {
+                                                  var tn, ln, i1, i2;
+                                                  arrayOfTeams.forEach(
+                                                    element => {
+                                                      if (
+                                                        element.id ==
+                                                        msg.chat.id
+                                                      ) {
+                                                        tn = element.teamName;
+                                                        ln = element.leaderName;
+                                                        i1 = element.id1;
+                                                        i2 = element.id2;
+                                                      }
+                                                    }
+                                                  );
+                                                  bot.sendMessage(
+                                                    msg.chat.id,
+                                                    tn + ln + i1 + i2
+                                                  );
+                                                })
                                                 .then(() => {
                                                   bot
                                                     .sendMessage(
@@ -188,13 +238,22 @@ bot.onText(/^\/CodeQuest/, msg => {
                                                               .then(() => {
                                                                 insertInDatabase(
                                                                   msg,
-                                                                  msg.chat
-                                                                    .first_name,
-                                                                  tname,
-                                                                  id1,
-                                                                  id2
+                                                                  arrayOfTeams
+                                                                );
+                                                                arrayOfTeams.shift();
+                                                                console.log(
+                                                                  arrayOfTeams
                                                                 );
                                                               });
+                                                          } else {
+                                                            bot.sendMessage(
+                                                              msg.chat.id,
+                                                              "Ok. Try filling the form again by /CodeQuest."
+                                                            );
+                                                            arrayOfTeams.shift();
+                                                            console.log(
+                                                              arrayOfTeams
+                                                            );
                                                           }
                                                         }
                                                       );
@@ -220,7 +279,17 @@ bot.onText(/^\/CodeQuest/, msg => {
     });
 });
 
-function insertInDatabase(msg, firstName, tname, id1, id2) {
+function insertInDatabase(msg, arrayOfTeams) {
+  var tname, id1, id2, leaderName;
+  arrayOfTeams.forEach(element => {
+    if (msg.chat.id == element.id) {
+      tname = element.teamName;
+      leaderName = element.leaderName;
+      id1 = element.id1;
+      id2 = element.id2;
+      // phone_number = element.phone_number;
+    }
+  });
   console.log("Team name: " + tname + " id1: " + id1 + " id2: " + id2);
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -298,7 +367,7 @@ function insertInDatabase(msg, firstName, tname, id1, id2) {
               insertQuery,
               [
                 tname,
-                firstName,
+                leaderName,
                 teamId,
                 id1 == 0 ? null : id1,
                 id2 == 0 ? null : id2

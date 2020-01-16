@@ -19,11 +19,11 @@ bot.onText(/\/eventDetails/, msg => {
       bot.sendMessage(
         msg.chat.id,
         "To know more about any event, use these commands: " +
-          "\nComputer Science: /cs" +
-          "\nElectronics: /elec" +
-          "\nInformals: /info" +
-          "\nPaper Presentation: /pp" +
-          "\nHackathon: /1hack"
+          "\nComputer Science: /compScience" +
+          "\nElectronics: /electronics" +
+          "\nInformals: /informals" +
+          "\nPaper Presentation: /paperPres" +
+          "\nHackathon: /hackDetails"
       );
     });
 });

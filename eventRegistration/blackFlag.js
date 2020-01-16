@@ -13,7 +13,20 @@ var yesno = {
     // }
   }
 };
+var team = {};
+var arrayOfTeams = [];
 bot.onText(/^\/blackFlag/, msg => {
+  team = {
+    id: "id",
+    leaderName: "leaderName",
+    teamName: "teamName",
+    teamSize: "teamSize",
+    id1: "0",
+    id2: "0",
+    id3: "0"
+  };
+  team.id = msg.chat.id;
+  team.leaderName = msg.chat.first_name;
   var str = "Name: " + msg.chat.first_name;
   bot
     .sendMessage(msg.chat.id, "Hello There, Please enter a team name!", {
@@ -30,6 +43,7 @@ bot.onText(/^\/blackFlag/, msg => {
           } else {
             tname = reply.text;
             str += "\nTeam name: " + tname;
+            team.teamName = tname;
             console.log(reply.text);
             bot
               .sendMessage(
@@ -58,6 +72,7 @@ bot.onText(/^\/blackFlag/, msg => {
                     } else {
                       teamSize = parseInt(reply.text);
                       str += "\nTeam Size: " + teamSize;
+                      team.teamSize = teamSize;
                       console.log(reply.text);
 
                       bot
@@ -81,13 +96,29 @@ bot.onText(/^\/blackFlag/, msg => {
                               else {
                                 id1 = parseInt(reply.text);
                                 str += "\nid1: " + id1;
+                                team.id1 = id1;
                                 console.log(reply.text);
                                 if (teamSize === 1) {
+                                  arrayOfTeams.push(team);
+
                                   bot
                                     .sendMessage(msg.chat.id, "Confirm Details")
-                                    .then(() =>
-                                      bot.sendMessage(msg.chat.id, str)
-                                    )
+                                    .then(() => {
+                                      var tn, ln, i1, i2, i3;
+                                      arrayOfTeams.forEach(element => {
+                                        if (element.id == msg.chat.id) {
+                                          tn = element.teamName;
+                                          ln = element.leaderName;
+                                          i1 = element.id1;
+                                          i2 = element.id2;
+                                          i3 = element.id3;
+                                        }
+                                      });
+                                      bot.sendMessage(
+                                        msg.chat.id,
+                                        tn + ln + i1 + i2 + i3
+                                      );
+                                    })
                                     .then(() => {
                                       bot
                                         .sendMessage(
@@ -103,20 +134,21 @@ bot.onText(/^\/blackFlag/, msg => {
                                                   msg.chat.id,
                                                   "Confirmed! Please wait while I enter your details"
                                                 )
-                                                .then(() =>
+                                                .then(() => {
                                                   insertInDatabase(
                                                     msg,
-                                                    tname,
-                                                    id1,
-                                                    id2,
-                                                    id3
-                                                  )
-                                                );
+                                                    arrayOfTeams
+                                                  ),
+                                                    arrayOfTeams.shift();
+                                                  console.log(arrayOfTeams);
+                                                });
                                             } else {
                                               bot.sendMessage(
                                                 msg.chat.id,
                                                 "Ok. Try filling the form again by /blackFlag."
                                               );
+                                              arrayOfTeams.shift();
+                                              console.log(arrayOfTeams);
                                             }
                                           });
                                         });
@@ -146,19 +178,36 @@ bot.onText(/^\/blackFlag/, msg => {
                                           else {
                                             id2 = parseInt(reply.text);
                                             str += "\nid2: " + id2;
+                                            team.id2 = id2;
                                             console.log(reply.text);
                                             if (teamSize === 2) {
+                                              arrayOfTeams.push(team);
                                               bot
                                                 .sendMessage(
                                                   msg.chat.id,
                                                   "Confirm Details"
                                                 )
-                                                .then(() =>
+                                                .then(() => {
+                                                  var tn, ln, i1, i2, i3;
+                                                  arrayOfTeams.forEach(
+                                                    element => {
+                                                      if (
+                                                        element.id ==
+                                                        msg.chat.id
+                                                      ) {
+                                                        tn = element.teamName;
+                                                        ln = element.leaderName;
+                                                        i1 = element.id1;
+                                                        i2 = element.id2;
+                                                        i3 = element.id3;
+                                                      }
+                                                    }
+                                                  );
                                                   bot.sendMessage(
                                                     msg.chat.id,
-                                                    str
-                                                  )
-                                                )
+                                                    tn + ln + i1 + i2 + i3
+                                                  );
+                                                })
                                                 .then(() => {
                                                   bot
                                                     .sendMessage(
@@ -173,21 +222,29 @@ bot.onText(/^\/blackFlag/, msg => {
                                                           if (
                                                             answer.text == "Yes"
                                                           ) {
-                                                            bot.sendMessage(
-                                                              msg.chat.id,
-                                                              "Confirmed! Please wait while I enter your details"
-                                                            );
-                                                            insertInDatabase(
-                                                              msg,
-                                                              tname,
-                                                              id1,
-                                                              id2,
-                                                              id3
-                                                            );
+                                                            bot
+                                                              .sendMessage(
+                                                                msg.chat.id,
+                                                                "Confirmed! Please wait while I enter your details"
+                                                              )
+                                                              .then(() => {
+                                                                insertInDatabase(
+                                                                  msg,
+                                                                  arrayOfTeams
+                                                                );
+                                                                arrayOfTeams.shift();
+                                                                console.log(
+                                                                  arrayOfTeams
+                                                                );
+                                                              });
                                                           } else {
                                                             bot.sendMessage(
                                                               msg.chat.id,
                                                               "Ok. Try filling the form again by /blackFlag."
+                                                            );
+                                                            arrayOfTeams.shift();
+                                                            console.log(
+                                                              arrayOfTeams
                                                             );
                                                           }
                                                         }
@@ -228,18 +285,50 @@ bot.onText(/^\/blackFlag/, msg => {
                                                           reply.text
                                                         );
                                                         str += "\nid3: " + id3;
+                                                        team.id3 = id3;
                                                         console.log(reply.text);
                                                         if (teamSize === 3) {
+                                                          arrayOfTeams.push(
+                                                            team
+                                                          );
                                                           bot
                                                             .sendMessage(
                                                               msg.chat.id,
                                                               "Confirm Details"
                                                             )
-                                                            .then(() =>
+                                                            .then(() => {
+                                                              var tn,
+                                                                ln,
+                                                                i1,
+                                                                i2,
+                                                                i3;
+                                                              arrayOfTeams.forEach(
+                                                                element => {
+                                                                  if (
+                                                                    element.id ==
+                                                                    msg.chat.id
+                                                                  ) {
+                                                                    tn =
+                                                                      element.teamName;
+                                                                    ln =
+                                                                      element.leaderName;
+                                                                    i1 =
+                                                                      element.id1;
+                                                                    i2 =
+                                                                      element.id2;
+                                                                    i3 =
+                                                                      element.id3;
+                                                                  }
+                                                                }
+                                                              );
                                                               bot
                                                                 .sendMessage(
                                                                   msg.chat.id,
-                                                                  str
+                                                                  tn +
+                                                                    ln +
+                                                                    i1 +
+                                                                    i2 +
+                                                                    i3
                                                                 )
                                                                 .then(() => {
                                                                   bot
@@ -258,33 +347,46 @@ bot.onText(/^\/blackFlag/, msg => {
                                                                               answer.text ==
                                                                               "Yes"
                                                                             ) {
-                                                                              bot.sendMessage(
-                                                                                msg
-                                                                                  .chat
-                                                                                  .id,
-                                                                                "Confirmed! Please wait while I enter your details"
-                                                                              );
-                                                                              insertInDatabase(
-                                                                                msg,
-                                                                                tname,
-                                                                                id1,
-                                                                                id2,
-                                                                                id3
-                                                                              );
+                                                                              bot
+                                                                                .sendMessage(
+                                                                                  msg
+                                                                                    .chat
+                                                                                    .id,
+                                                                                  "Confirmed! Please wait while I enter your details"
+                                                                                )
+                                                                                .then(
+                                                                                  () => {
+                                                                                    insertInDatabase(
+                                                                                      msg,
+                                                                                      arrayOfTeams
+                                                                                    );
+                                                                                    arrayOfTeams.shift();
+                                                                                    console.log(
+                                                                                      arrayOfTeams
+                                                                                    );
+                                                                                  }
+                                                                                );
                                                                             } else {
                                                                               bot.sendMessage(
                                                                                 msg
                                                                                   .chat
+    
+    
+    
                                                                                   .id,
                                                                                 "Ok. Try filling the form again by /blackFlag."
+                                                                              );
+                                                                              arrayOfTeams.shift();
+                                                                              console.log(
+                                                                                arrayOfTeams
                                                                               );
                                                                             }
                                                                           }
                                                                         );
                                                                       }
                                                                     );
-                                                                })
-                                                            );
+                                                                });
+                                                            });
                                                         }
                                                       }
                                                     }
@@ -310,7 +412,18 @@ bot.onText(/^\/blackFlag/, msg => {
     });
 });
 
-function insertInDatabase(msg, tname, id1, id2, id3) {
+function insertInDatabase(msg, arrayOfTeams) {
+  var tname, id1, id2, id3, leaderName;
+  arrayOfTeams.forEach(element => {
+    if (msg.chat.id == element.id) {
+      tname = element.teamName;
+      leaderName = element.leaderName;
+      id1 = element.id1;
+      id2 = element.id2;
+      id3 = element.id3;
+      // phone_number = element.phone_number;
+    }
+  });
   console.log(
     "Team name: " + tname + " id1: " + id1 + " id2: " + id2 + " id3: " + id3
   );
@@ -393,7 +506,7 @@ function insertInDatabase(msg, tname, id1, id2, id3) {
               insertQuery,
               [
                 tname,
-                msg.chat.first_name,
+                leaderName,
                 teamId,
                 id1 == 0 ? null : id1,
                 id2 == 0 ? null : id2,

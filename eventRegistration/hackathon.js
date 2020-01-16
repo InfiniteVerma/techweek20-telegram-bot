@@ -15,7 +15,21 @@ var yesno = {
     // }
   }
 };
+var team = {};
+var arrayOfTeams = [];
 bot.onText(/\/hackathon/, msg => {
+  team = {
+    id: "id",
+    leaderName: "leaderName",
+    teamName: "teamName",
+    teamSize: "teamSize",
+    id1: "0",
+    id2: "0",
+    id3: "0",
+    id4: "0"
+  };
+  team.id = msg.chat.id;
+  team.leaderName = msg.chat.first_name;
   var str = "Name: " + msg.chat.first_name;
   bot
     .sendMessage(msg.chat.id, "Hello There, Please enter a team name!", {
@@ -32,6 +46,7 @@ bot.onText(/\/hackathon/, msg => {
           } else {
             tname = reply.text;
             str += "\nTeam name: " + tname;
+            team.teamName = tname;
             console.log(reply.text);
             bot
               .sendMessage(
@@ -61,7 +76,7 @@ bot.onText(/\/hackathon/, msg => {
                       size = parseInt(reply.text);
                       str += "\nTeam Size: " + size;
                       console.log(reply.text);
-
+                      team.teamSize = size;
                       bot
                         .sendMessage(msg.chat.id, "Enter id1", {
                           reply_markup: JSON.stringify({ force_reply: true })
@@ -83,13 +98,32 @@ bot.onText(/\/hackathon/, msg => {
                               else {
                                 id1 = parseInt(reply.text);
                                 str += "\nid1: " + id1;
+                                team.id1 = id1;
                                 console.log(reply.text);
                                 if (size === 1) {
+                                  arrayOfTeams.push(team);
                                   bot
                                     .sendMessage(msg.chat.id, "Confirm Details")
-                                    .then(() =>
-                                      bot
-                                        .sendMessage(msg.chat.id, str)
+                                    // .then(() =>
+                                      // bot
+                                        // .sendMessage(msg.chat.id, str)
+                                        .then(() => {
+                                          var tn, ln, i1, i2, i3, i4;
+                                          arrayOfTeams.forEach(element => {
+                                            if (element.id == msg.chat.id) {
+                                              tn = element.teamName;
+                                              ln = element.leaderName;
+                                              i1 = element.id1;
+                                              i2 = element.id2;
+                                              i3 = element.id3;
+                                              i4 = element.id4;
+                                            }
+                                          });
+                                          bot.sendMessage(
+                                            msg.chat.id,
+                                            tn + ln + i1 + i2 + i3 + i4
+                                          );
+                                        })
                                         .then(() => {
                                           bot
                                             .sendMessage(
@@ -100,28 +134,31 @@ bot.onText(/\/hackathon/, msg => {
                                             .then(() => {
                                               bot.once("message", answer => {
                                                 if (answer.text == "Yes") {
-                                                  bot.sendMessage(
-                                                    msg.chat.id,
-                                                    "Confirmed! Please wait while I enter your details"
-                                                  );
-                                                  insertInDatabase(
-                                                    msg,
-                                                    msg.chat.first_name,
-                                                    tname,
-                                                    id1,
-                                                    id2,
-                                                    id3,
-                                                    id4
-                                                  );
+                                                  bot
+                                                    .sendMessage(
+                                                      msg.chat.id,
+                                                      "Confirmed! Please wait while I enter your details"
+                                                    )
+                                                    .then(() => {
+                                                      insertInDatabase(
+                                                        msg,
+                                                        arrayOfTeams
+                                                      );
+                                                      arrayOfTeams.shift();
+                                                      console.log(arrayOfTeams);
+                                                    });
                                                 } else {
                                                   bot.sendMessage(
                                                     msg.chat.id,
                                                     "Ok. Try filling the form again by /hackathon."
                                                   );
+                                                  arrayOfTeams.shift();
+                                                  console.log(arrayOfTeams);
                                                 }
                                               });
                                             });
-                                        })
+                                        }
+                                        // )
                                     );
                                 } else if (size > 1) {
                                   bot
@@ -149,17 +186,40 @@ bot.onText(/\/hackathon/, msg => {
                                             id2 = parseInt(reply.text);
                                             str += "\nid2: " + id2;
                                             console.log(reply.text);
+                                            team.id2 = id2;
                                             if (size === 2) {
+                                              arrayOfTeams.push(team);
                                               bot
                                                 .sendMessage(
                                                   msg.chat.id,
                                                   "Confirm Details"
                                                 )
-                                                .then(() =>
+                                                .then(() => {
+                                                  var tn, ln, i1, i2, i3, i4;
+                                                  arrayOfTeams.forEach(
+                                                    element => {
+                                                      if (
+                                                        element.id ==
+                                                        msg.chat.id
+                                                      ) {
+                                                        tn = element.teamName;
+                                                        ln = element.leaderName;
+                                                        i1 = element.id1;
+                                                        i2 = element.id2;
+                                                        i3 = element.id3;
+                                                        i4 = element.id4;
+                                                      }
+                                                    }
+                                                  );
                                                   bot
                                                     .sendMessage(
                                                       msg.chat.id,
-                                                      str
+                                                      tn +
+                                                        ln +
+                                                        i1 +
+                                                        i2 +
+                                                        i3 +
+                                                        i4
                                                     )
                                                     .then(() => {
                                                       bot
@@ -176,31 +236,36 @@ bot.onText(/\/hackathon/, msg => {
                                                                 answer.text ==
                                                                 "Yes"
                                                               ) {
-                                                                bot.sendMessage(
-                                                                  msg.chat.id,
-                                                                  "Confirmed! Please wait while I enter your details"
-                                                                );
-                                                                insertInDatabase(
-                                                                  msg,
-                                                                  msg.chat
-                                                                    .first_name,
-                                                                  tname,
-                                                                  id1,
-                                                                  id2,
-                                                                  id3,
-                                                                  id4
-                                                                );
+                                                                bot
+                                                                  .sendMessage(
+                                                                    msg.chat.id,
+                                                                    "Confirmed! Please wait while I enter your details"
+                                                                  )
+                                                                  .then(() => {
+                                                                    insertInDatabase(
+                                                                      msg,
+                                                                      arrayOfTeams
+                                                                    );
+                                                                    arrayOfTeams.shift();
+                                                                    console.log(
+                                                                      arrayOfTeams
+                                                                    );
+                                                                  });
                                                               } else {
                                                                 bot.sendMessage(
                                                                   msg.chat.id,
                                                                   "Ok. Try filling the form again by /hackathon."
                                                                 );
+                                                                arrayOfTeams.shift();
+                                                                console.log(
+                                                                  arrayOfTeams
+                                                                );
                                                               }
                                                             }
                                                           );
                                                         });
-                                                    })
-                                                );
+                                                    });
+                                                });
                                             } else if (size > 2) {
                                               bot
                                                 .sendMessage(
@@ -236,17 +301,53 @@ bot.onText(/\/hackathon/, msg => {
                                                         );
                                                         str += "\nid3: " + id3;
                                                         console.log(reply.text);
+                                                        team.id3 = reply.text;
                                                         if (size === 3) {
+                                                          arrayOfTeams.push(
+                                                            team
+                                                          );
                                                           bot
                                                             .sendMessage(
                                                               msg.chat.id,
                                                               "Confirm Details"
                                                             )
-                                                            .then(() =>
+                                                            .then(() => {
+                                                              var tn,
+                                                                ln,
+                                                                i1,
+                                                                i2,
+                                                                i3,
+                                                                i4;
+                                                              arrayOfTeams.forEach(
+                                                                element => {
+                                                                  if (
+                                                                    element.id ==
+                                                                    msg.chat.id
+                                                                  ) {
+                                                                    tn =
+                                                                      element.teamName;
+                                                                    ln =
+                                                                      element.leaderName;
+                                                                    i1 =
+                                                                      element.id1;
+                                                                    i2 =
+                                                                      element.id2;
+                                                                    i3 =
+                                                                      element.id3;
+                                                                    i4 =
+                                                                      element.id4;
+                                                                  }
+                                                                }
+                                                              );
                                                               bot
                                                                 .sendMessage(
                                                                   msg.chat.id,
-                                                                  str
+                                                                  tn +
+                                                                    ln +
+                                                                    i1 +
+                                                                    i2 +
+                                                                    i3 +
+                                                                    i4
                                                                 )
                                                                 .then(() => {
                                                                   bot
@@ -273,14 +374,11 @@ bot.onText(/\/hackathon/, msg => {
                                                                               );
                                                                               insertInDatabase(
                                                                                 msg,
-                                                                                msg
-                                                                                  .chat
-                                                                                  .first_name,
-                                                                                tname,
-                                                                                id1,
-                                                                                id2,
-                                                                                id3,
-                                                                                id4
+                                                                                arrayOfTeams
+                                                                              );
+                                                                              arrayOfTeams.shift();
+                                                                              console.log(
+                                                                                arrayOfTeams
                                                                               );
                                                                             } else {
                                                                               bot.sendMessage(
@@ -289,14 +387,21 @@ bot.onText(/\/hackathon/, msg => {
                                                                                   .id,
                                                                                 "Ok. Try filling the form again by /hackathon."
                                                                               );
+                                                                              arrayOfTeams.shift();
+                                                                              console.log(
+                                                                                arrayOfTeams
+                                                                              );
                                                                             }
                                                                           }
                                                                         );
                                                                       }
                                                                     );
-                                                                })
-                                                            );
+                                                                });
+                                                            });
                                                         } else if (size === 4) {
+                                                          arrayOfTeams.push(
+                                                            team
+                                                          );
                                                           bot
                                                             .sendMessage(
                                                               msg.chat.id,
@@ -344,7 +449,7 @@ bot.onText(/\/hackathon/, msg => {
                                                                       str +=
                                                                         "\nid4: " +
                                                                         id4;
-
+                                                                      team.id4 = id4;
                                                                       bot
                                                                         .sendMessage(
                                                                           msg
@@ -353,13 +458,47 @@ bot.onText(/\/hackathon/, msg => {
                                                                           "Confirm Details"
                                                                         )
                                                                         .then(
-                                                                          () =>
+                                                                          () => {
+                                                                            var tn,
+                                                                              ln,
+                                                                              i1,
+                                                                              i2,
+                                                                              i3,
+                                                                              i4;
+                                                                            arrayOfTeams.forEach(
+                                                                              element => {
+                                                                                if (
+                                                                                  element.id ==
+                                                                                  msg
+                                                                                    .chat
+                                                                                    .id
+                                                                                ) {
+                                                                                  tn =
+                                                                                    element.teamName;
+                                                                                  ln =
+                                                                                    element.leaderName;
+                                                                                  i1 =
+                                                                                    element.id1;
+                                                                                  i2 =
+                                                                                    element.id2;
+                                                                                  i3 =
+                                                                                    element.id3;
+                                                                                  i4 =
+                                                                                    element.id4;
+                                                                                }
+                                                                              }
+                                                                            );
                                                                             bot
                                                                               .sendMessage(
                                                                                 msg
                                                                                   .chat
                                                                                   .id,
-                                                                                str
+                                                                                tn +
+                                                                                  ln +
+                                                                                  i1 +
+                                                                                  i2 +
+                                                                                  i3 +
+                                                                                  i4
                                                                               )
                                                                               .then(
                                                                                 () => {
@@ -388,14 +527,11 @@ bot.onText(/\/hackathon/, msg => {
                                                                                               );
                                                                                               insertInDatabase(
                                                                                                 msg,
-                                                                                                msg
-                                                                                                  .chat
-                                                                                                  .first_name,
-                                                                                                tname,
-                                                                                                id1,
-                                                                                                id2,
-                                                                                                id3,
-                                                                                                id4
+                                                                                                arrayOfTeams
+                                                                                              );
+                                                                                              arrayOfTeams.shift();
+                                                                                              console.log(
+                                                                                                arrayOfTeams
                                                                                               );
                                                                                             } else {
                                                                                               bot.sendMessage(
@@ -404,13 +540,18 @@ bot.onText(/\/hackathon/, msg => {
                                                                                                   .id,
                                                                                                 "Ok. Try filling the form again by /hackathon."
                                                                                               );
+                                                                                              arrayOfTeams.shift();
+                                                                                              console.log(
+                                                                                                arrayOfTeams
+                                                                                              );
                                                                                             }
                                                                                           }
                                                                                         );
                                                                                       }
                                                                                     );
                                                                                 }
-                                                                              )
+                                                                              );
+                                                                          }
                                                                         );
                                                                     }
                                                                   }
@@ -442,7 +583,19 @@ bot.onText(/\/hackathon/, msg => {
     });
 });
 
-function insertInDatabase(msg, firstName, tname, id1, id2, id3, id4) {
+function insertInDatabase(msg, arrayOfTeams) {
+  var tname, id1, id2, id3, id4, leaderName;
+  arrayOfTeams.forEach(element => {
+    if (msg.chat.id == element.id) {
+      tname = element.teamName;
+      leaderName = element.leaderName;
+      id1 = element.id1;
+      id2 = element.id2;
+      id3 = element.id3;
+      id4 = element.id4;
+      // phone_number = element.phone_number;
+    }
+  });
   console.log(
     "Team name: " +
       tname +
@@ -535,7 +688,7 @@ function insertInDatabase(msg, firstName, tname, id1, id2, id3, id4) {
               insertQuery,
               [
                 tname,
-                firstName,
+                leaderName,
                 teamId,
                 id1 == 0 ? null : id1,
                 id2 == 0 ? null : id2,

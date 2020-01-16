@@ -9,7 +9,16 @@ var yesno = {
   }
 };
 var userid;
+var team = {};
+var arrayOfTeams = [];
 bot.onText(/\/MagnaOdeyssey/, msg => {
+  team = {
+    id: "id",
+    leaderName: "leaderName",
+    id1: "id1"
+  };
+  team.id = msg.chat.id;
+  team.leaderName = msg.chat.first_name;
   bot
     .sendMessage(msg.chat.id, "Please Enter your user ID", {
       reply_markup: JSON.stringify({ force_reply: true })
@@ -31,24 +40,30 @@ bot.onText(/\/MagnaOdeyssey/, msg => {
             );
           } else {
             userid = reply.text;
+            team.id1 = reply.text;
             bot
               .sendMessage(msg.chat.id, "Should I submit this? ", yesno)
               .then(() => {
                 bot.once("message", answer => {
                   if (answer.text == "Yes") {
+                    arrayOfTeams.push(team)
                     bot
                       .sendMessage(
                         msg.chat.id,
                         "Confirmed! Please wait while I enter your details"
                       )
-                      .then(() =>
-                        insertInDatabase(msg, msg.chat.first_name, userid)
-                      );
+                      .then(() =>{
+                        insertInDatabase(msg, arrayOfTeams)
+                        arrayOfTeams.shift()
+                        console.log(arrayOfTeams)
+                      });
                   } else {
                     bot.sendMessage(
                       msg.chat.id,
                       "Ok. Try filling the form again by /MagnaOdeyssey."
                     );
+                    arrayOfTeams.shift();
+                    console.log(arrayOfTeams);
                   }
                 });
               });
@@ -58,8 +73,16 @@ bot.onText(/\/MagnaOdeyssey/, msg => {
     });
 });
 
-function insertInDatabase(msg, name, userid) {
-  console.log("Name: " + name + "userid: " + userid);
+function insertInDatabase(msg, arrayOfTeams) {
+  var id1, leaderName;
+  arrayOfTeams.forEach(element => {
+    if (msg.chat.id == element.id) {
+      leaderName = element.leaderName;
+      id1 = element.id1;
+      // phone_number = element.phone_number;
+    }
+  });
+  console.log("Name: " + leaderName + "userid: " + userid);
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true
@@ -102,7 +125,7 @@ function insertInDatabase(msg, name, userid) {
               console.log("Is not in pp database, inserting");
               client.query(
                 insertIntoDBQuery,
-                [msg.chat.first_name, userid],
+                [leaderName, id1],
                 (err, data) => {
                   if (err) {
                     console.log(err);

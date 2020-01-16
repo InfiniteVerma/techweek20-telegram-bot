@@ -11,8 +11,8 @@ require("./eventDetails/info");
 
 //participant registration
 require("./participant/details");
-require("./participant/participantRegistration");
-require("./participant/submitForm");
+require("./participant/participation1");
+// require("./participant/submitForm");
 
 //event registration
 require("./eventRegistration/elecWorkshop");

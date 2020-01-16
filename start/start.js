@@ -13,6 +13,8 @@ bot.onText(/\/start/, msg => {
     "1: Individual User Registration /register\n" + 
     "2: Event Details /eventDetails\n"+
     "3: Event Registration "
-    )
+    ).then(()=>{
+      bot.sendMessage(msg.chat.id, 'In case the bot hangs, please wait for a few minutes before trying again.')
+    })
   })
 });
