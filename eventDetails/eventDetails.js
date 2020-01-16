@@ -21,6 +21,7 @@ bot.onText(/\/eventDetails/, msg => {
         "To know more about any event, use these commands: " +
           "\nComputer Science: /compScience" +
           "\nElectronics: /electronics" +
+          "\nGraphics: /graphics"+
           "\nInformals: /informals" +
           "\nPaper Presentation: /paperPres" +
           "\nHackathon: /hackDetails"

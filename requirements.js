@@ -6,7 +6,7 @@ require("./eventDetails/elec");
 require("./eventDetails/pp");
 require("./eventDetails/hack");
 require("./eventDetails/info");
-
+require("./eventDetails/graphics")
 // require("./trasheventRegistration");
 
 //participant registration
