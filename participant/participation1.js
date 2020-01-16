@@ -186,7 +186,7 @@ function insertInDatabase(msg, arrayOfPeople) {
   var participant_id = 202046000;
   const now = new Date();
   var noOutstation = outstation.toLowerCase() == "yes" ? 1 : 0;
-  const getExistingPhoneNumbersQuery = "Select phone from techweek.participant";
+  const getExistingPhoneNumbersQuery = "Select email from techweek.participant";
   const findIdQuery = "Select max(id) from techweek.participant";
   const insertDataQuery =
     "INSERT INTO techweek.participant(time, name, email, outstation, phone, id) VALUES ($1, $2, $3, $4, $5, $6) returning *";
@@ -199,7 +199,8 @@ function insertInDatabase(msg, arrayOfPeople) {
       var phoneNumberListFromDB = data.rows;
       console.log(phoneNumberListFromDB);
       phoneNumberListFromDB.forEach(p => {
-        if (p.phone == parseInt(phone_number)) {
+        console.log(p.email+email)
+        if (p.email === email) {
           isPresentInDB = true;
         }
       });
@@ -207,7 +208,8 @@ function insertInDatabase(msg, arrayOfPeople) {
         bot.sendMessage(
           msg.chat.id,
           "You have already registered as a participant!\n" +
-            "Check out our events: /eventDetails"
+            "Check out our events: /eventDetails"+
+            "\nView your participation id: /partDetails"
         );
         client.end();
         return;
@@ -243,7 +245,8 @@ function insertInDatabase(msg, arrayOfPeople) {
                   bot.sendMessage(
                     msg.chat.id,
                     "You have successfully registered!\n" +
-                      "Check out our events: /eventDetails"
+                      "Check out our events: /eventDetails"+
+                      "\nView your participation id: /partDetails"
                   );
                 }
               }
