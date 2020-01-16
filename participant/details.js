@@ -18,7 +18,7 @@ const requestPhoneKeyboard = {
   }
 };
 var email;
-bot.onText(/\/participantDetails/, msg => {
+bot.onText(/\/partDetails/, msg => {
   bot
     .sendMessage(msg.chat.id, "Enter email", {
       reply_markup: JSON.stringify({ force_reply: true })

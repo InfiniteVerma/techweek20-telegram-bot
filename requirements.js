@@ -26,4 +26,6 @@ require("./eventRegistration/magna")
 
 //start command
 require("./start/start");
+require("./start/developers")
+require("./start/help")
 // require("./trashsubmitEvents");

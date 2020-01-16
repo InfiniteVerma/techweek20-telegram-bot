@@ -11,10 +11,13 @@ bot.onText(/\/start/, msg => {
   ).then(()=>{
     bot.sendMessage(msg.chat.id, "These are the things I can do: \n" +
     "1: Individual User Registration /register\n" + 
-    "2: Event Details /eventDetails\n"+
-    "3: Event Registration "
+    "2: Event Details /eventDetails\n"
+    // "3: Event Registration "
     ).then(()=>{
-      bot.sendMessage(msg.chat.id, 'In case the bot hangs, please wait for a few minutes before trying again.')
+      bot.sendMessage(msg.chat.id, 'Tips: \n1:In case the bot hangs, please wait for a few minutes before trying again.'+
+      '\n2: After registering, you can view your participation id through /partDetails'+
+      '\n3: Use /help to get human assistance'+
+      '\n4: Check out my /developers')
     })
   })
 });
