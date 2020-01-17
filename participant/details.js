@@ -69,6 +69,7 @@ bot.onText(/\/partDetails/, msg => {
                 console.log(details.phone);
                 console.log(details.id);
                 console.log(details.collegename)
+                var outstation = parseInt(details.outstation)==0?'No':'Yes'
                 bot.sendMessage(
                   msg.chat.id,
                   "These are your details: \n" +
@@ -77,7 +78,7 @@ bot.onText(/\/partDetails/, msg => {
                     "\nEmail: " +
                     details.email +
                     "\nOutstation: " +
-                    details.outstation +
+                    outstation +
                     "\nParticipation id: " +
                     details.id +
                     "\nCollege: " +
