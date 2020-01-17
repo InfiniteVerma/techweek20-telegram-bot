@@ -33,7 +33,8 @@ bot.onText(/\/register/, msg => {
     id: "id",
     first_name: "first_name",
     email: "email",
-    outstation: "outstation"
+    outstation: "outstation",
+    college: "Manipal Institue of Technology"
   };
   person.id = msg.chat.id;
   person.first_name = msg.chat.first_name;
@@ -45,6 +46,7 @@ bot.onText(/\/register/, msg => {
   });
   var email;
   var outstation;
+  var collegeName;
   if (alreadyEntered == true) {
     bot.sendMessage(
       msg.chat.id,
@@ -84,57 +86,142 @@ bot.onText(/\/register/, msg => {
                       console.log(reply.text);
                       person.outstation = reply.text;
                       console.log(person);
-                      arrayOfPeople.push(person);
-                      bot
-                        .sendMessage(
-                          msg.chat.id,
-                          "Thanks for entering the form. These are your details."
-                        )
-                        .then(() => {
-                          var n, e, o;
-                          arrayOfPeople.forEach(element => {
-                            if (element.id == msg.chat.id) {
-                              (n = element.first_name), (e = element.email);
-                              o = element.outstation;
-                            }
-                          });
-                          bot.sendMessage(
-                            msg.chat.id,
-                            "Name: " +
-                              n +
-                              "\nEmail: " +
-                              e +
-                              "\nOutstation: " +
-                              o
-                          );
-                        })
-                        .then(() => {
-                          bot
-                            .sendMessage(
-                              msg.chat.id,
-                              "Should I submit this?",
-                              yesno
-                            )
-                            .then(() => {
-                              bot.once("message", answer => {
-                                if (answer.text == "Yes") {
-                                  bot.sendMessage(
-                                    msg.chat.id,
-                                    "Confirmed! Please wait while I enter your details."
-                                  );
-                                  insertInDatabase(msg, arrayOfPeople);
-                                  arrayOfPeople.shift();
+                      if (person.outstation.toLowerCase() == "yes") {
+                        bot
+                          .sendMessage(msg.chat.id, "Enter your college name", {
+                            reply_markup: JSON.stringify({ force_reply: true })
+                          })
+                          .then(sentMessage => {
+                            bot.onReplyToMessage(
+                              sentMessage.chat.id,
+                              sentMessage.message_id,
+                              reply => {
+                                if (reply.text == "") {
+                                  console.log("error");
                                 } else {
-                                  bot.sendMessage(
-                                    msg.chat.id,
-                                    "Ok. Try filling the form again by /register."
-                                  );
-                                  arrayOfPeople.shift();
-                                  console.log(arrayOfPeople);
+                                  collegeName = reply.text;
+                                  console.log(reply.text);
+                                  person.college = reply.text;
+                                  arrayOfPeople.push(person);
+                                  bot
+                                    .sendMessage(
+                                      msg.chat.id,
+                                      "Thanks for entering the form. These are your details."
+                                    )
+                                    .then(() => {
+                                      var n, e, o, c;
+                                      arrayOfPeople.forEach(element => {
+                                        if (element.id == msg.chat.id) {
+                                          n = element.first_name;
+                                            e = element.email;
+                                          
+                                          o = element.outstation;
+                                          c = element.college;
+                                        }
+                                      });
+                                      bot.sendMessage(
+                                        msg.chat.id,
+                                        "Name: " +
+                                          n +
+                                          "\nEmail: " +
+                                          e +
+                                          "\nOutstation: " +
+                                          o +
+                                          "\nCollege: " +
+                                          c
+                                      );
+                                    })
+                                    .then(() => {
+                                      bot
+                                        .sendMessage(
+                                          msg.chat.id,
+                                          "Should I submit this?",
+                                          yesno
+                                        )
+                                        .then(() => {
+                                          bot.once("message", answer => {
+                                            if (answer.text == "Yes") {
+                                              bot.sendMessage(
+                                                msg.chat.id,
+                                                "Confirmed! Please wait while I enter your details."
+                                              );
+                                              insertInDatabase(
+                                                msg,
+                                                arrayOfPeople
+                                              );
+                                              arrayOfPeople.shift();
+                                            } else {
+                                              bot.sendMessage(
+                                                msg.chat.id,
+                                                "Ok. Try filling the form again by /register."
+                                              );
+                                              arrayOfPeople.shift();
+                                              console.log(arrayOfPeople);
+                                            }
+                                          });
+                                        });
+                                    });
                                 }
-                              });
+                              }
+                            );
+                          });
+                      } else {
+                        arrayOfPeople.push(person);
+                        bot
+                          .sendMessage(
+                            msg.chat.id,
+                            "Thanks for entering the form. These are your details."
+                          )
+                          .then(() => {
+                            var n, e, o, c;
+                            arrayOfPeople.forEach(element => {
+                              if (element.id == msg.chat.id) {
+                                n = element.first_name;
+                                  e = element.email;
+                                o = element.outstation;
+                                c = element.college;
+                              }
                             });
-                        });
+                            bot.sendMessage(
+                              msg.chat.id,
+                              "Name: " +
+                                n +
+                                "\nEmail: " +
+                                e +
+                                "\nOutstation: " +
+                                o +
+                                "\nCollege: " +
+                                c
+                            );
+                          })
+                          .then(() => {
+                            bot
+                              .sendMessage(
+                                msg.chat.id,
+                                "Should I submit this?",
+                                yesno
+                              )
+                              .then(() => {
+                                bot.once("message", answer => {
+                                  if (answer.text == "Yes") {
+                                    bot.sendMessage(
+                                      msg.chat.id,
+                                      "Confirmed! Please wait while I enter your details."
+                                    );
+                                    insertInDatabase(msg, arrayOfPeople);
+                                    arrayOfPeople.shift();
+                                  } else {
+                                    bot.sendMessage(
+                                      msg.chat.id,
+                                      "Ok. Try filling the form again by /register."
+                                    );
+                                    arrayOfPeople.shift();
+                                    console.log(arrayOfPeople);
+                                  }
+                                });
+                              });
+                          });
+                      }
                     }
                   }
                 );
@@ -158,16 +245,18 @@ function insertInDatabase(msg, arrayOfPeople) {
   var email;
   var outstation;
   var phone_number = 0;
+  var collegeName = 'Manipal Institute of Technology'
   arrayOfPeople.forEach(element => {
     if (msg.chat.id == element.id) {
       first_name = element.first_name;
       email = element.email;
       outstation = element.outstation;
+      collegeName = element.college
       // phone_number = element.phone_number;
     }
   });
   console.log("inserting this:");
-  console.log(first_name + email + outstation + phone_number);
+  console.log(first_name + email + outstation + phone_number + collegeName);
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true
@@ -189,7 +278,7 @@ function insertInDatabase(msg, arrayOfPeople) {
   const getExistingPhoneNumbersQuery = "Select email from techweek.participant";
   const findIdQuery = "Select max(id) from techweek.participant";
   const insertDataQuery =
-    "INSERT INTO techweek.participant(time, name, email, outstation, phone, id) VALUES ($1, $2, $3, $4, $5, $6) returning *";
+    "INSERT INTO techweek.participant(time, name, email, outstation, phone, id, collegename) VALUES ($1, $2, $3, $4, $5, $6, $7) returning *";
 
   client.query(getExistingPhoneNumbersQuery, (err, data) => {
     if (err) {
@@ -199,7 +288,7 @@ function insertInDatabase(msg, arrayOfPeople) {
       var phoneNumberListFromDB = data.rows;
       console.log(phoneNumberListFromDB);
       phoneNumberListFromDB.forEach(p => {
-        console.log(p.email+email)
+        console.log(p.email + email);
         if (p.email === email) {
           isPresentInDB = true;
         }
@@ -208,7 +297,7 @@ function insertInDatabase(msg, arrayOfPeople) {
         bot.sendMessage(
           msg.chat.id,
           "You have already registered as a participant!\n" +
-            "Check out our events: /eventDetails"+
+            "Check out our events: /eventDetails" +
             "\nView your participation id: /partDetails"
         );
         client.end();
@@ -229,7 +318,8 @@ function insertInDatabase(msg, arrayOfPeople) {
                 email,
                 noOutstation,
                 phone_number,
-                participant_id
+                participant_id,
+                collegeName
               ],
               (err, data) => {
                 if (err) {
@@ -245,8 +335,11 @@ function insertInDatabase(msg, arrayOfPeople) {
                   bot.sendMessage(
                     msg.chat.id,
                     "You have successfully registered!\n" +
-                      "Check out our events: /eventDetails"+
-                      "\nView your participation id: /partDetails"
+                      
+                      "Your participant id is: " + participant_id + 
+                      "\nPlease keep a note of it."+
+                      "\nCheck out our events: /eventDetails"
+                      // "\nView your participation id: /partDetails"
                   );
                 }
               }

@@ -68,6 +68,7 @@ bot.onText(/\/partDetails/, msg => {
                 console.log(details.outstation);
                 console.log(details.phone);
                 console.log(details.id);
+                console.log(details.collegename)
                 bot.sendMessage(
                   msg.chat.id,
                   "These are your details: \n" +
@@ -78,7 +79,9 @@ bot.onText(/\/partDetails/, msg => {
                     "\nOutstation: " +
                     details.outstation +
                     "\nParticipation id: " +
-                    details.id
+                    details.id +
+                    "\nCollege: " +
+                    details.collegename
                 );
                 client.end();
               }
