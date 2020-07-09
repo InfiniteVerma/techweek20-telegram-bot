@@ -1,3 +1,4 @@
+heroku ps
 heroku pg:psql << EOF
 \x
 \COPY techweek.participant to '~/DATABASE/participant.csv' with (format csv, delimiter ',', header true);
